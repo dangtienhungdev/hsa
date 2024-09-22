@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/src/favicon.ico" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="HSA" />
+  <meta name="keywords" content="HSA" />
+  <link rel="apple-touch-icon" href="/src/assets/logo/logo192.png" />
+  <title>HSA</title>
+  <style>
+    .screen {
+      width: 98vw;
+      height: 97vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-container {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      transform: rotate(45deg);
+      animation: preloader 1.2s infinite linear;
+    }
+
+    .loading-container i {
+      width: 12px;
+      height: 12px;
+      position: absolute;
+      background: #1890ff;
+      border-radius: 100%;
+      display: block;
+      transform-origin: 50% 50%;
+      opacity: .3;
+      animation: preloader_i 1.2s infinite linear;
+    }
+
+    .loading-container i:nth-child(1) {
+      top: 0;
+      left: 0;
+    }
+
+    .loading-container i:nth-child(2) {
+      top: 0;
+      right: 0;
+      animation-delay: 0.4s;
+    }
+
+    .loading-container i:nth-child(3) {
+      right: 0;
+      bottom: 0;
+      animation-delay: 0.8s;
+    }
+
+    .loading-container i:nth-child(4) {
+      bottom: 0;
+      left: 0;
+      animation-delay: 1.2s;
+    }
+
+    @keyframes preloader {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes preloader_i {
+      0% {
+        opacity: .3;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: .3;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root">
+    <div class="screen">
+      <div class="loading-container">
+        <i></i>
+        <i></i>
+        <i></i>
+        <i></i>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
