@@ -11,6 +11,7 @@
     "antd": "^5.0.2",
     "autoprefixer": "^10.4.20",
     "axios": "^0.24.0",
+    "dayjs": "^1.11.13",
     "driver.js": "^0.9.8",
     "history": "^5.0.1",
     "lodash": "^4.17.21",

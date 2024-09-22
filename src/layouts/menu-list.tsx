@@ -2,26 +2,12 @@ import type { MenuList } from '@/interface/layout/menu.interface';
 
 import pathUrl from '@/utils/path.util';
 
-const mockMenuList: MenuList = [
+const menuList: MenuList = [
   {
     code: `${pathUrl.exams}-list`,
-    title: 'Đề thi',
-    icon: 'documentation',
+    title: 'Danh sách đề thi',
+    icon: 'dashboard',
     path: pathUrl.exams,
-    children: [
-      {
-        code: pathUrl.addExam,
-        title: 'Thêm đề thi',
-        icon: 'dashboard',
-        path: pathUrl.addExam,
-      },
-      {
-        code: pathUrl.exams,
-        title: 'Danh sách đề thi',
-        icon: 'dashboard',
-        path: pathUrl.exams,
-      },
-    ],
   },
   {
     code: `${pathUrl.questions}-list`,
@@ -45,4 +31,4 @@ const mockMenuList: MenuList = [
   },
 ];
 
-export default mockMenuList;
+export default menuList;

@@ -5,13 +5,13 @@ import { Suspense, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 
-import mockMenuList from '@/mock/user/menu.mock';
 import { setUserItem } from '@/stores/user.store';
 import { getFirstPathCode } from '@/utils/getFirstPathCode';
 import { getGlobalState } from '@/utils/getGloabal';
 
 import HeaderComponent from './header';
 import MenuComponent from './menu';
+import menuList from './menu-list';
 
 const { Sider, Content } = Layout;
 const WIDTH = 992;
@@ -75,7 +75,7 @@ const LayoutPage = ({ children }: LayoutProps) => {
             breakpoint="md"
           >
             <MenuComponent
-              menuList={mockMenuList}
+              menuList={menuList}
               openKey={openKey}
               onChangeOpenKey={k => setOpenkey(k)}
               selectedKey={selectedKey}
@@ -92,7 +92,7 @@ const LayoutPage = ({ children }: LayoutProps) => {
             open={!collapsed}
           >
             <MenuComponent
-              menuList={mockMenuList}
+              menuList={menuList}
               openKey={openKey}
               onChangeOpenKey={k => setOpenkey(k)}
               selectedKey={selectedKey}
