@@ -5,3 +5,8 @@ export type TModal<T> = {
   type: TModalType;
   currentData: T | null;
 };
+
+export type Response<T> = {
+  success: string;
+  data: T[];
+};

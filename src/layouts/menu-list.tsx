@@ -10,24 +10,16 @@ const menuList: MenuList = [
     path: pathUrl.exams,
   },
   {
+    code: `${pathUrl.subjects}-list`,
+    title: 'Các môn học',
+    icon: 'dashboard',
+    path: pathUrl.subjects,
+  },
+  {
     code: `${pathUrl.questions}-list`,
-    title: 'Câu hỏi',
+    title: 'Danh sách câu hỏi',
     icon: 'dashboard',
     path: pathUrl.questions,
-    children: [
-      {
-        code: pathUrl.addQuestion,
-        title: 'Thêm câu hỏi',
-        icon: 'dashboard',
-        path: pathUrl.addQuestion,
-      },
-      {
-        code: pathUrl.questions,
-        title: 'Danh sách câu hỏi',
-        icon: 'dashboard',
-        path: pathUrl.questions,
-      },
-    ],
   },
 ];
 

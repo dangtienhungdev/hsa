@@ -7,10 +7,9 @@ import { useRoutes } from 'react-router-dom';
 
 import LayoutPage from '@/layouts';
 import ExamPage from '@/pages/exams';
-import AddExam from '@/pages/exams/add-exam';
 import LoginPage from '@/pages/login';
 import Questions from '@/pages/questions';
-import AddQuestion from '@/pages/questions/add-question';
+import Subjects from '@/pages/subjects';
 import pathUrl from '@/utils/path.util';
 
 import { ProtectedRoute } from './config';
@@ -39,10 +38,10 @@ const routeList: RouteObject[] = [
         ),
       },
       {
-        path: pathUrl.addQuestion,
+        path: pathUrl.subjects,
         element: (
           <LayoutPage>
-            <AddQuestion />
+            <Subjects />
           </LayoutPage>
         ),
       },
@@ -51,14 +50,6 @@ const routeList: RouteObject[] = [
         element: (
           <LayoutPage>
             <ExamPage />
-          </LayoutPage>
-        ),
-      },
-      {
-        path: pathUrl.addExam,
-        element: (
-          <LayoutPage>
-            <AddExam />
           </LayoutPage>
         ),
       },

@@ -1,7 +1,7 @@
 const pathUrl = {
   questions: '/questions',
   addQuestion: '/add-question',
-
+  subjects: '/subjects',
   exams: '/exams',
   addExam: '/add-exam',
 
