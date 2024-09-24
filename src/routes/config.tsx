@@ -1,19 +1,16 @@
-import type { FC } from 'react';
-import type { RouteProps } from 'react-router';
-
-import { useEffect } from 'react';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 
-import { useAuthContext } from '@/contexts/auth.context';
+import type { RouteProps } from 'react-router';
 import { getAccessTokenFromLocalStorage } from '@/utils/auth.util';
 import pathUrl from '@/utils/path.util';
+import { useAuthContext } from '@/contexts/auth.context';
+import { useEffect } from 'react';
 
-export interface WrapperRouteProps extends RouteProps {
-  /** document title locale id */
+export type WrapperRouteProps = RouteProps & {
   titleId: string;
-}
+};
 
-const WrapperRouteComponent: FC<WrapperRouteProps> = ({ titleId }) => {
+const WrapperRouteComponent = ({ titleId }: WrapperRouteProps) => {
   const sessionToken = getAccessTokenFromLocalStorage();
 
   const navigate = useNavigate();

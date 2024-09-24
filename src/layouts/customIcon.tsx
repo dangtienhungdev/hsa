@@ -1,5 +1,3 @@
-import type { FC } from 'react';
-
 import { ReactComponent as AccountSvg } from '@/assets/menu/account.svg';
 import { ReactComponent as DashboardSvg } from '@/assets/menu/dashboard.svg';
 import { ReactComponent as DocumentationSvg } from '@/assets/menu/documentation.svg';
@@ -10,7 +8,7 @@ interface CustomIconProps {
   type: string;
 }
 
-export const CustomIcon: FC<CustomIconProps> = props => {
+export const CustomIcon = (props: CustomIconProps) => {
   const { type } = props;
   let com = <GuideSvg />;
 

@@ -1,11 +1,12 @@
+import 'ckeditor5/ckeditor5.css';
 import './styles/index.less';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createRoot } from 'react-dom/client'; // Import createRoot from react-dom/client
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
 
 import App from './App';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { createRoot } from 'react-dom/client'; // Import createRoot from react-dom/client
 import store from './stores';
 
 const queryClient = new QueryClient();

@@ -4,6 +4,7 @@ const pathUrl = {
   subjects: '/subjects',
   exams: '/exams',
   addExam: '/add-exam',
+  examDetail: '/exams/:examId',
 
   // auth
   login: '/login',

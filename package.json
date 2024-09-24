@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^43.1.0",
+    "@ckeditor/ckeditor5-react": "^9.2.0",
     "@emotion/core": "^11.0.0",
     "@emotion/react": "^11.5.0",
     "@reduxjs/toolkit": "^1.4.0",
@@ -11,12 +13,15 @@
     "antd": "^5.0.2",
     "autoprefixer": "^10.4.20",
     "axios": "^0.24.0",
+    "ckeditor5": "^43.1.0",
+    "ckeditor5-build-classic-mathtype": "^1.0.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "driver.js": "^0.9.8",
     "framer-motion": "^11.5.6",
     "history": "^5.0.1",
     "lodash": "^4.17.21",
+    "mathjax-react": "^2.0.1",
     "mockjs": "^1.1.0",
     "postcss": "^8.4.47",
     "query-string": "^7.0.1",
@@ -27,6 +32,7 @@
     "react-router-dom": "^6.0.0",
     "recharts": "^2.1.13",
     "tailwind-merge": "^2.5.2",
+    "tailwind-scrollbar-hide": "^1.1.7",
     "tailwindcss": "^3.4.12"
   },
   "scripts": {

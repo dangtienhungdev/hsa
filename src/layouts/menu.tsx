@@ -1,13 +1,10 @@
-import type { FC } from 'react';
-import type { MenuList } from '../interface/layout/menu.interface';
-
-import { Menu } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-
-import { setUserItem } from '@/stores/user.store';
 
 import { CustomIcon } from './customIcon';
+import { Menu } from 'antd';
+import type { MenuList } from '../interface/layout/menu.interface';
+import { setUserItem } from '@/stores/user.store';
+import { useNavigate } from 'react-router-dom';
 
 interface MenuProps {
   menuList: MenuList;
@@ -17,7 +14,7 @@ interface MenuProps {
   onChangeSelectedKey: (key: string) => void;
 }
 
-const MenuComponent: FC<MenuProps> = props => {
+const MenuComponent = (props: MenuProps) => {
   const { menuList, openKey, onChangeOpenKey, selectedKey, onChangeSelectedKey } = props;
   const { device } = useSelector(state => state.user);
   const navigate = useNavigate();

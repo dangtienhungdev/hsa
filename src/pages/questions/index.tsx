@@ -1,11 +1,11 @@
-import type { TQuestion } from '@/interface/question.type';
-
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Col, Row } from 'antd';
+import { Card, CardDescription, CardTitle } from '@/components/ui/cart';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
+import FormQuestion from './components/form-question';
+import type { TQuestion } from '@/interface/question.type';
 import { questionApi } from '@/api/questions.api';
 import { subjectApi } from '@/api/subject.api';
-import { Card, CardDescription, CardTitle } from '@/components/ui/cart';
 import { useToggleModal } from '@/hooks/useToggleModal';
 
 const Questions = () => {
@@ -19,11 +19,7 @@ const Questions = () => {
   });
 
   // get data subject
-  const {
-    data: dataSubject,
-    isLoading: isLoadingSubject,
-    isFetching: isFetchingSubject,
-  } = useQuery({
+  const { data: dataSubject } = useQuery({
     queryKey: ['subjects'],
     queryFn: () => subjectApi.getAllSubject(),
   });
@@ -50,6 +46,8 @@ const Questions = () => {
             );
           })}
       </Row>
+
+      <FormQuestion modalInfo={currentModal} onClose={onCloseModal} />
     </div>
   );
 };

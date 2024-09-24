@@ -1,4 +1,3 @@
-import type { FC } from 'react';
 import type { RouteObject } from 'react-router';
 
 import { lazy } from 'react';
@@ -7,6 +6,7 @@ import { useRoutes } from 'react-router-dom';
 
 import LayoutPage from '@/layouts';
 import ExamPage from '@/pages/exams';
+import ExamId from '@/pages/exams/[examId]';
 import LoginPage from '@/pages/login';
 import Questions from '@/pages/questions';
 import Subjects from '@/pages/subjects';
@@ -53,6 +53,14 @@ const routeList: RouteObject[] = [
           </LayoutPage>
         ),
       },
+      {
+        path: pathUrl.examDetail,
+        element: (
+          <LayoutPage>
+            <ExamId />
+          </LayoutPage>
+        ),
+      },
     ],
   },
   {
@@ -65,7 +73,7 @@ const routeList: RouteObject[] = [
   },
 ];
 
-const RenderRouter: FC = () => {
+const RenderRouter = () => {
   const element = useRoutes(routeList);
 
   return element;

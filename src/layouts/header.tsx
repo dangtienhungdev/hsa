@@ -1,14 +1,12 @@
-import type { FC } from 'react';
-
-import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
 import { Dropdown, Layout, theme as antTheme } from 'antd';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
 
-import Avator from '@/assets/header/avator.jpeg';
 import AntdSvg from '@/assets/logo/antd.svg';
+import Avator from '@/assets/header/avator.jpeg';
 import ReactSvg from '@/assets/logo/react.svg';
 import pathUrl from '@/utils/path.util';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const { Header } = Layout;
 
@@ -19,7 +17,7 @@ interface HeaderProps {
 
 type Action = 'userInfo' | 'userSetting' | 'logout';
 
-const HeaderComponent: FC<HeaderProps> = ({ collapsed, toggle }) => {
+const HeaderComponent = ({ collapsed, toggle }: HeaderProps) => {
   const { logged, device } = useSelector(state => state.user);
   const navigate = useNavigate();
   const token = antTheme.useToken();

@@ -19,6 +19,7 @@ const ExamPage = () => {
     queryKey: ['exams'],
     queryFn: () => examApi.getExams(),
   });
+  const dataExams = data?.data;
 
   // delete
   const deleteMutation = useMutation({
@@ -53,7 +54,7 @@ const ExamPage = () => {
 
       <Table
         loading={isLoading}
-        dataSource={data}
+        dataSource={dataExams}
         rowKey={record => record.id}
         className="cursor-pointer"
         columns={columns}

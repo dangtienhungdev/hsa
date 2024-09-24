@@ -12,4 +12,5 @@ export type TBodyExam = {
   name: string;
   code: string;
   description: string;
+  subject_ids: number[];
 };
