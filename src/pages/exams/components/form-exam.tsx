@@ -2,7 +2,7 @@ import type { TModal } from '@/interface/common.type';
 import type { TBodyExam, TExam } from '@/interface/exam.type';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Checkbox, Col, Form, Input, Modal, Row, Space, message } from 'antd';
+import { Button, Col, Form, Input, Modal, Row, Space, message } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { useEffect, useState } from 'react';
 
@@ -119,8 +119,8 @@ const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
           <Button
             key="submit"
             htmlType="submit"
-            disabled={createExamMutation.isPending}
-            loading={createExamMutation.isPending}
+            disabled={createExamMutation.isLoading}
+            loading={createExamMutation.isLoading}
             className="!rounded md:min-w-[120px] !h-[42px]"
             size="large"
             onClick={() => form.submit()}
@@ -164,7 +164,7 @@ const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
               <Input placeholder={'Mô tả đề thi'} className="!rounded w-full !h-[42px]" size="large" />
             </Form.Item>
           </Col>
-          <Col span={12} className="h-[300px] overflow-y-scroll">
+          {/* <Col span={12} className="h-[300px] overflow-y-scroll">
             <Form.Item
               name={'subject_ids'}
               label={'Tổ hợp đề thi'}
@@ -180,7 +180,7 @@ const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
                 ))}
               </Checkbox.Group>
             </Form.Item>
-          </Col>
+          </Col> */}
         </Row>
       </Form>
     </Modal>

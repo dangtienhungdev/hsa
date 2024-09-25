@@ -1,12 +1,12 @@
-import { Dropdown, Layout, theme as antTheme } from 'antd';
 import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
+import { Dropdown, Layout } from 'antd';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import AntdSvg from '@/assets/logo/antd.svg';
 import Avator from '@/assets/header/avator.jpeg';
+import AntdSvg from '@/assets/logo/antd.svg';
 import ReactSvg from '@/assets/logo/react.svg';
 import pathUrl from '@/utils/path.util';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
 const { Header } = Layout;
 
@@ -20,7 +20,6 @@ type Action = 'userInfo' | 'userSetting' | 'logout';
 const HeaderComponent = ({ collapsed, toggle }: HeaderProps) => {
   const { logged, device } = useSelector(state => state.user);
   const navigate = useNavigate();
-  const token = antTheme.useToken();
 
   const onActionClick = async (action: Action) => {
     switch (action) {
@@ -36,14 +35,14 @@ const HeaderComponent = ({ collapsed, toggle }: HeaderProps) => {
   };
 
   return (
-    <Header className="layout-page-header bg-2" style={{ backgroundColor: token.token.colorBgContainer }}>
+    <Header className="!bg-white layout-page-header">
       {device !== 'MOBILE' && (
         <div className="logo" style={{ width: collapsed ? 80 : 200 }}>
           <img src={ReactSvg} alt="" style={{ marginRight: collapsed ? '2px' : '20px' }} />
           <img src={AntdSvg} alt="" />
         </div>
       )}
-      <div className="layout-page-header-main">
+      <div className="layout-page-header-main !bg-white">
         <div onClick={toggle}>
           <span id="sidebar-trigger">{collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</span>
         </div>

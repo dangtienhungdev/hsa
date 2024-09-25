@@ -40,9 +40,9 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="flex items-center justify-center h-screen">
       <Form<LoginParams> form={form} onFinish={onFinished} className="flex flex-col gap-6">
-        <p className="font-medium text-2xl text-center">Đăng nhập</p>
+        <p className="text-2xl font-medium text-center">Đăng nhập</p>
 
         <div className="flex flex-col gap-6">
           <Form.Item
@@ -80,8 +80,8 @@ const LoginForm = () => {
             className="!rounded md:w-[480px] w-full !h-[42px]"
             size="large"
             type="primary"
-            loading={loginMutation.isPending}
-            disabled={loginMutation.isPending}
+            loading={loginMutation.isLoading}
+            disabled={loginMutation.isLoading}
           >
             Đăng nhập
           </Button>

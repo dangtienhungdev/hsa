@@ -1,16 +1,19 @@
-import { Button, Col, Row } from 'antd';
-import { Card, CardDescription, CardTitle } from '@/components/ui/cart';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-
-import FormQuestion from './components/form-question';
 import type { TQuestion } from '@/interface/question.type';
+
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Col, Row } from 'antd';
+import { useNavigate } from 'react-router-dom';
+
 import { questionApi } from '@/api/questions.api';
 import { subjectApi } from '@/api/subject.api';
+import { Card, CardDescription, CardTitle } from '@/components/ui/cart';
 import { useToggleModal } from '@/hooks/useToggleModal';
+import pathUrl from '@/utils/path.util';
 
 const Questions = () => {
   const queryClient = useQueryClient();
   const { currentModal, onCloseModal, onOpenModal } = useToggleModal<TQuestion>();
+  const navigate = useNavigate();
 
   // get data questions
   const { data, isLoading, isFetching } = useQuery({
@@ -27,7 +30,7 @@ const Questions = () => {
   return (
     <div className="flex flex-col w-full gap-6">
       <div className="flex items-center justify-between">
-        <Button type="primary" size="large" className="!rounded" onClick={() => onOpenModal('add')}>
+        <Button type="primary" size="large" className="!rounded" onClick={() => navigate(pathUrl.addQuestion)}>
           Thêm câu hỏi
         </Button>
       </div>
@@ -47,7 +50,7 @@ const Questions = () => {
           })}
       </Row>
 
-      <FormQuestion modalInfo={currentModal} onClose={onCloseModal} />
+      {/* <FormQuestion modalInfo={currentModal} onClose={onCloseModal} /> */}
     </div>
   );
 };

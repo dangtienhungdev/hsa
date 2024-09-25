@@ -1,5 +1,4 @@
-import { animate, motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 import { cn } from '@/libs/cn';
 
@@ -60,14 +59,6 @@ export const Skeleton = () => {
       { duration: 0.8 },
     ],
   ];
-
-  useEffect(() => {
-    // @ts-ignore
-    animate(sequence, {
-      repeat: Infinity,
-      repeatDelay: 1,
-    });
-  }, []);
 
   return (
     <div className="relative flex items-center justify-center h-full p-8 overflow-hidden">

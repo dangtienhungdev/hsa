@@ -14,3 +14,19 @@ export type TQuestion = {
   exam: TExam;
   subject: TSubject;
 };
+
+type Option = {
+  text: string;
+  is_correct: boolean;
+};
+
+export type TQuestionBaseBody = {
+  name: string;
+  type: QuestionType; // Nếu có nhiều loại câu hỏi khác nhau, có thể thêm vào đây
+  subject_id: number;
+  is_group: boolean;
+};
+
+export type TQuestionSingle = TQuestionBaseBody & {
+  options: Option[];
+};

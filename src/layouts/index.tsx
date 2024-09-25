@@ -1,6 +1,6 @@
 import './index.less';
 
-import { Drawer, Layout, theme as antTheme } from 'antd';
+import { Drawer, Layout } from 'antd';
 import { Suspense, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
@@ -25,7 +25,6 @@ const LayoutPage = ({ children }: LayoutProps) => {
   const [openKey, setOpenkey] = useState<string>();
   const [selectedKey, setSelectedKey] = useState<string>(location.pathname);
   const { device, collapsed } = useSelector(state => state.user);
-  const token = antTheme.useToken();
 
   const isMobile = device === 'MOBILE';
   const dispatch = useDispatch();
@@ -66,10 +65,9 @@ const LayoutPage = ({ children }: LayoutProps) => {
       <Layout>
         {!isMobile ? (
           <Sider
-            className="layout-page-sider"
+            className="layout-page-sider !bg-white"
             trigger={null}
             collapsible
-            style={{ backgroundColor: token.token.colorBgContainer }}
             collapsedWidth={isMobile ? 0 : 80}
             collapsed={collapsed}
             breakpoint="md"

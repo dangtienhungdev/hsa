@@ -7,7 +7,7 @@ import { mockDataQuestions } from '../mocks/data';
 const ContentExam = () => {
   return (
     <div className="h-[calc(100vh_-_64px_-_48px_-_56px)] overflow-y-scroll bg-white scrollbar-hide">
-      {mockDataQuestions.map((quesiton, index) => {
+      {mockDataQuestions.map((quesiton: any, index) => {
         return (
           // <div key={quesiton.id} className="px-4 py-4 border-b border-b-gray-300">
           //   <div className="flex flex-col gap-3">

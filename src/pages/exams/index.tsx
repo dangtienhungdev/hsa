@@ -41,7 +41,7 @@ const ExamPage = () => {
   const columns = ColumnExams({
     onDeleteExam: handleDeleteExam,
     onOpenModal,
-    isLoadingDelete: deleteMutation.isPending,
+    isLoadingDelete: deleteMutation.isLoading,
   });
 
   return (

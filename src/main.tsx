@@ -6,24 +6,27 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { createRoot } from 'react-dom/client'; // Import createRoot from react-dom/client
+import ReactDOM from 'react-dom'; // Sử dụng ReactDOM từ react-dom thay vì createRoot
+import { StrictMode } from 'react';
 import store from './stores';
 
 const queryClient = new QueryClient();
 
-// Find the root DOM element where you want to mount your app
+// Tìm root DOM element để mount ứng dụng của bạn
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
-  const root = createRoot(rootElement); // Create a root for React 18
+  ReactDOM.render(
+    <StrictMode>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </StrictMode>,
 
-  root.render(
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </QueryClientProvider>
-    </BrowserRouter>,
+    rootElement,
   );
 }

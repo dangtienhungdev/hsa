@@ -1,31 +1,18 @@
+import type { Dispatch, SetStateAction } from 'react';
+
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from 'ckeditor5-build-classic-mathtype';
-// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { useState } from 'react';
 
-const Editor = () => {
-  const [editorData, setEditorData] = useState('');
+interface EditorProps {
+  value: string;
+  setValue: Dispatch<SetStateAction<string>>;
+}
 
+const Editor = ({ value, setValue }: EditorProps) => {
   return (
     <div>
       <CKEditor
         editor={ClassicEditor}
-        data={editorData}
-        onReady={editor => {
-          console.log('Editor is ready to use!', editor);
-        }}
-        onChange={(event, editor) => {
-          const data = editor.getData();
-
-          setEditorData(data);
-        }}
-        onBlur={(event, editor) => {
-          console.log('Blur.', editor);
-        }}
-        onFocus={(event, editor) => {
-          console.log('Focus.', editor);
-        }}
         config={{
           toolbar: {
             shouldNotGroupWhenFull: true,
@@ -55,9 +42,13 @@ const Editor = () => {
             ],
           },
         }}
-      />
+        data={value}
+        onChange={(_: any, editor: any) => {
+          const data = editor.getData();
 
-      {JSON.stringify(editorData)}
+          setValue(data);
+        }}
+      />
     </div>
   );
 };

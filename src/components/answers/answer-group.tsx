@@ -11,7 +11,7 @@ const AnswerGroup = ({ questions }: AnswerGroupProps) => {
 
   return (
     <>
-      {questions?.map((question, index) => {
+      {questions?.map((question: any, index) => {
         return (
           <Question
             key={question.id}

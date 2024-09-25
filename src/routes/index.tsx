@@ -9,6 +9,7 @@ import ExamPage from '@/pages/exams';
 import ExamId from '@/pages/exams/[examId]';
 import LoginPage from '@/pages/login';
 import Questions from '@/pages/questions';
+import CreateQuestion from '@/pages/questions/create-question';
 import Subjects from '@/pages/subjects';
 import pathUrl from '@/utils/path.util';
 
@@ -34,6 +35,14 @@ const routeList: RouteObject[] = [
         element: (
           <LayoutPage>
             <Questions />
+          </LayoutPage>
+        ),
+      },
+      {
+        path: pathUrl.addQuestion,
+        element: (
+          <LayoutPage>
+            <CreateQuestion />
           </LayoutPage>
         ),
       },

@@ -1,4 +1,4 @@
-import type { TQuestion } from '@/interface/question.type';
+import type { TQuestion, TQuestionSingle } from '@/interface/question.type';
 
 import axiosInstance from './request';
 
@@ -10,5 +10,12 @@ export const questionApi = {
     const response = await axiosInstance.get<TQuestion[]>(url);
 
     return response.data;
+  },
+
+  // create single question
+  createQuestionSignle: async (body: TQuestionSingle) => {
+    const response = await axiosInstance.post(url, body);
+
+    return response;
   },
 };
