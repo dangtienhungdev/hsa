@@ -15,12 +15,12 @@ const menuList: MenuList = [
   //   icon: 'dashboard',
   //   path: pathUrl.subjects,
   // },
-  {
-    code: `${pathUrl.questions}-list`,
-    title: 'Danh sách câu hỏi',
-    icon: 'dashboard',
-    path: pathUrl.questions,
-  },
+  // {
+  //   code: `${pathUrl.questions}-list`,
+  //   title: 'Danh sách câu hỏi',
+  //   icon: 'dashboard',
+  //   path: pathUrl.questions,
+  // },
 ];
 
 export default menuList;

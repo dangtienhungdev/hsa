@@ -58,7 +58,7 @@ export const ColumnExams = ({ onOpenModal, isLoadingDelete, onDeleteExam }: Colu
           <Space align="center">
             <Button
               className="flex items-center justify-center !rounded-md"
-              onClick={() => navigate(`${pathUrl.exams}/${record.id}`)}
+              onClick={() => navigate(`${pathUrl.exams}/${record.id}?name=${record.name}`)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

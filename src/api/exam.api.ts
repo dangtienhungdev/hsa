@@ -1,9 +1,11 @@
 import type { TBodyExam, TExam } from '@/interface/exam.type';
+import type { Section } from '@/interface/section.type';
 import type { DataWithPaginate } from './../interface/common.type';
 
 import axiosInstance from './request';
 
 const url = `/exams`;
+const listQuestionByExamSecion = `/list-questions-by-exam-and-section`;
 
 export const examApi = {
   // get exams
@@ -31,5 +33,12 @@ export const examApi = {
     const response = await axiosInstance.put(`${url}/${data.id}`, data);
 
     return response.data;
+  },
+
+  // get sections
+  getQuestionInExamSection: async (examId: string, sectionId: string) => {
+    const response = await axiosInstance.get<Section>(`${listQuestionByExamSecion}/${examId}/${sectionId}`);
+
+    return response;
   },
 };

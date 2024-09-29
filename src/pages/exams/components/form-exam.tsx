@@ -1,13 +1,13 @@
 import type { TModal } from '@/interface/common.type';
 import type { TBodyExam, TExam } from '@/interface/exam.type';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Col, Form, Input, Modal, Row, Space, message } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { useEffect, useState } from 'react';
 
 import { examApi } from '@/api/exam.api';
-import { subjectApi } from '@/api/subject.api';
+import Editor from '@/components/ckeditor';
 import { generateExamCode } from '@/utils/generate-exam-code';
 
 interface FormExamProps {
@@ -18,16 +18,16 @@ interface FormExamProps {
 const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
   const queryClient = useQueryClient();
   const { currentData, type, visiable } = modalInfo;
+  const [desc, setDesc] = useState<string>('');
 
   // thêm mới đề thi
   const createExamMutation = useMutation({
     mutationKey: ['create-exam'],
     mutationFn: (body: Omit<TBodyExam, 'id'>) => examApi.createExam(body),
     onSuccess: () => {
+      onClose();
       message.success('Thêm mới đề thi thành công!');
       queryClient.invalidateQueries({ queryKey: ['exams'] });
-      onClose();
-      form.resetFields();
     },
     onError: () => {
       message.error('Có lỗi xảy ra, thử lại sau!');
@@ -49,26 +49,12 @@ const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
     },
   });
 
-  // get data subject
-  const {
-    data: dataSubject,
-    isLoading: isLoadingSubject,
-    isFetching: isFetchingSubject,
-  } = useQuery({
-    queryKey: ['subjects'],
-    queryFn: () => subjectApi.getAllSubject(),
-  });
-
   const [form] = useForm();
 
   const onFinish = (data: Omit<TBodyExam, 'id'>) => {
     if (type === 'add') {
       createExamMutation.mutate(data);
     }
-
-    // if (type === 'edit') {
-    //   editExamMutation.mutate({ ...data, id: currentData?.id as number });
-    // }
   };
 
   const handleCloseForm = () => {
@@ -79,24 +65,14 @@ const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
   useEffect(() => {
     if (currentData) {
       form.setFieldsValue({
-        name: currentData.name,
-        code: currentData.code,
-        description: currentData.description,
+        name: currentData.name || '',
+        code: currentData.code || '',
+        description: currentData.description || '', // Đảm bảo description là chuỗi hợp lệ
       });
+    } else {
+      form.resetFields();
     }
   }, [form, currentData]);
-
-  const [selectSubjects, setSelectSubjects] = useState<number[]>([]);
-
-  const onChangeChecked = (checkedValues: number[]) => {
-    if (checkedValues.length > 3) {
-      message.error('Bạn chỉ được chọn tổ hợp 3 môn học!');
-
-      return;
-    }
-
-    setSelectSubjects(checkedValues);
-  };
 
   return (
     <Modal
@@ -141,7 +117,7 @@ const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
         }}
       >
         <Row gutter={[16, 16]}>
-          <Col span={12}>
+          <Col span={24}>
             <Form.Item
               name={'name'}
               label={'Tên đề thi'}
@@ -160,27 +136,20 @@ const FormExam = ({ modalInfo, onClose }: FormExamProps) => {
               name={'description'}
               label={'Mô tả đề thi'}
               rules={[{ required: true, message: 'Mô tả đề thi là bắt buộc!', whitespace: true }]}
+              className="!mb-0"
             >
-              <Input placeholder={'Mô tả đề thi'} className="!rounded w-full !h-[42px]" size="large" />
+              <Editor
+                value={desc || ''} // Đảm bảo rằng giá trị truyền vào CKEditor luôn là chuỗi
+                setValue={newValue => {
+                  setDesc(newValue);
+                  form.setFieldsValue({
+                    description: newValue,
+                  });
+                }}
+              />
+              {/* <Input placeholder={'Mô tả đề thi'} className="!rounded w-full !h-[42px]" size="large" /> */}
             </Form.Item>
           </Col>
-          {/* <Col span={12} className="h-[300px] overflow-y-scroll">
-            <Form.Item
-              name={'subject_ids'}
-              label={'Tổ hợp đề thi'}
-              rules={[{ required: true, message: 'Chọn tổ hợp môn!' }]}
-            >
-              <Checkbox.Group style={{ width: '100%' }} onChange={e => onChangeChecked(e)}>
-                {dataSubject?.map(item => (
-                  <section className="flex items-center justify-between w-full" key={item.id}>
-                    <Checkbox value={item.id} className="flex-1">
-                      {item.name}
-                    </Checkbox>
-                  </section>
-                ))}
-              </Checkbox.Group>
-            </Form.Item>
-          </Col> */}
         </Row>
       </Form>
     </Modal>

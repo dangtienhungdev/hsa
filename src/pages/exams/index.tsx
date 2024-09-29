@@ -1,10 +1,12 @@
 import type { TExam } from '@/interface/exam.type';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Table, message } from 'antd';
+import { Breadcrumb, Button, Col, Row, Table, message } from 'antd';
+import { Link } from 'react-router-dom';
 
 import { examApi } from '@/api/exam.api';
 import { useToggleModal } from '@/hooks/useToggleModal';
+import pathUrl from '@/utils/path.util';
 
 import { ColumnExams } from './components/column-exam';
 import FormExam from './components/form-exam';
@@ -46,11 +48,23 @@ const ExamPage = () => {
 
   return (
     <div className="flex flex-col w-full gap-6">
-      <div className="flex items-center justify-between">
-        <Button type="primary" size="large" className="!rounded" onClick={() => onOpenModal('add')}>
-          Thêm đề thi
-        </Button>
-      </div>
+      <Row className="!mb-6 sticky top-0 right-0 left-0 z-10 bg-0-gray-secondary shadow-sm pb-6">
+        <Col span={12} className="!flex !items-center">
+          <Breadcrumb>
+            <Breadcrumb.Item>
+              <Link to={pathUrl.exams}>Đề thi</Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <span className="">Danh sách đề thi</span>
+            </Breadcrumb.Item>
+          </Breadcrumb>
+        </Col>
+        <Col span={12} className="!flex !justify-end">
+          <Button type="primary" size="large" className="!rounded" onClick={() => onOpenModal('add')}>
+            Thêm đề thi
+          </Button>
+        </Col>
+      </Row>
 
       <Table
         loading={isLoading}

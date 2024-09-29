@@ -6,6 +6,7 @@ const pathUrl = {
   exams: '/exams',
   addExam: '/add-exam',
   examDetail: '/exams/:examId',
+  examDetailSection: '/exams/:examId/:sectionId',
 
   // auth
   login: '/login',

@@ -7,6 +7,7 @@ import { useRoutes } from 'react-router-dom';
 import LayoutPage from '@/layouts';
 import ExamPage from '@/pages/exams';
 import ExamId from '@/pages/exams/[examId]';
+import SectionPage from '@/pages/exams/[examId]/[sectionId]';
 import LoginPage from '@/pages/login';
 import Questions from '@/pages/questions';
 import QuestionDetail from '@/pages/questions/[subjectId]';
@@ -83,6 +84,14 @@ const routeList: RouteObject[] = [
         element: (
           <LayoutPage>
             <ExamId />
+          </LayoutPage>
+        ),
+      },
+      {
+        path: pathUrl.examDetailSection,
+        element: (
+          <LayoutPage>
+            <SectionPage />
           </LayoutPage>
         ),
       },

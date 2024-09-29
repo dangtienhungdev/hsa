@@ -122,7 +122,7 @@ const CreateQuestion = () => {
       onFinish={onFinish}
     >
       <Row className="!mb-6 sticky top-0 right-0 left-0 z-10 bg-0-gray-secondary shadow-sm pb-6">
-        <Col span={12}>
+        <Col span={12} className="!flex !items-center">
           <Breadcrumb>
             <Breadcrumb.Item>
               <Link to={pathUrl.questions}>Danh sách câu hỏi</Link>

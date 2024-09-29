@@ -1,66 +1,46 @@
-import type { QuestionType } from '@/interface/question.type';
+import { useQuery } from '@tanstack/react-query';
+import { Col, Empty, Row } from 'antd';
+import { Link, useParams } from 'react-router-dom';
 
-import Question from '@/components/question/question';
-
-import { mockDataQuestions } from '../mocks/data';
+import { sectionApi } from '@/api/section.api';
+import { Card, CardTitle } from '@/components/ui/cart';
+import { cn } from '@/libs/cn';
+import pathUrl from '@/utils/path.util';
 
 const ContentExam = () => {
+  const { examId } = useParams();
+
+  const { data: dataSections, isLoading } = useQuery({
+    queryKey: ['sections'],
+    queryFn: () => sectionApi.getAllSections(),
+  });
+
   return (
-    <div className="h-[calc(100vh_-_64px_-_48px_-_56px)] overflow-y-scroll bg-white scrollbar-hide">
-      {mockDataQuestions.map((quesiton: any, index) => {
-        return (
-          // <div key={quesiton.id} className="px-4 py-4 border-b border-b-gray-300">
-          //   <div className="flex flex-col gap-3">
-          //     <p className="">
-          //       <span className="text-base font-medium">Câu hỏi {index + 1}: </span>{' '}
-          //       <span className="">{quesiton.name}</span>
-          //     </p>
+    <>
+      {(dataSections?.length === 0 || isLoading) && (
+        <div className={cn('h-full overflow-y-scroll scrollbar-hide flex items-center justify-center')}>
+          <Empty />
+        </div>
+      )}
 
-          //     {quesiton.type === 'single' && <AnswerSingle answers={quesiton.answers as AnswerSingleType[]} />}
-          //     {quesiton.type === 'input' && <AnswerInput answers={quesiton.answers as AnswerInputType[]} />}
-          //     {quesiton.type === 'group' && <AnswerGroup questions={quesiton.children as AnswerGroupType[]} />}
-          //   </div>
-
-          //   <div className="flex items-center justify-end gap-4 pt-4 mt-4 border-t border-t-gray-200">
-          //     <div className="flex items-center gap-2">
-          //       <span className="">Thứ tự hiển thị</span>
-          //       <InputNumber className="!rounded" value={index + 1} />
-          //     </div>
-
-          //     <Button
-          //       danger
-          //       icon={
-          //         <svg
-          //           xmlns="http://www.w3.org/2000/svg"
-          //           fill="none"
-          //           viewBox="0 0 24 24"
-          //           strokeWidth={1.5}
-          //           stroke="currentColor"
-          //           className="size-4"
-          //         >
-          //           <path
-          //             strokeLinecap="round"
-          //             strokeLinejoin="round"
-          //             d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-          //           />
-          //         </svg>
-          //       }
-          //     />
-          //   </div>
-          // </div>
-          <Question
-            key={quesiton.id}
-            questions={{
-              id: quesiton.id,
-              index: index + 1,
-              answers: quesiton.answers || quesiton.children,
-              nameQuestion: quesiton.name,
-              type: quesiton.type as QuestionType,
-            }}
-          />
-        );
-      })}
-    </div>
+      {dataSections && dataSections?.length > 0 && (
+        <Row gutter={[24, 24]}>
+          {dataSections &&
+            dataSections.length > 0 &&
+            dataSections.map(subject => {
+              return (
+                <Col span={6} key={subject.id}>
+                  <Link to={`${pathUrl.exams}/${examId}/${subject.id}`}>
+                    <Card className="!rounded-md cursor-pointer hover:bg-blue-50">
+                      <CardTitle>{subject.name}</CardTitle>
+                    </Card>
+                  </Link>
+                </Col>
+              );
+            })}
+        </Row>
+      )}
+    </>
   );
 };
 

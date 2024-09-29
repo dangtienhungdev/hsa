@@ -100,7 +100,7 @@ const LayoutPage = ({ children }: LayoutProps) => {
         )}
         <Content className="layout-page-content">
           <Suspense fallback={null}>
-            <div className="h-full p-6">{children}</div>
+            <div className="h-[calc(100vh_-_64px)] p-6">{children}</div>
           </Suspense>
         </Content>
       </Layout>
