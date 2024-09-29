@@ -9,12 +9,12 @@ const menuList: MenuList = [
     icon: 'dashboard',
     path: pathUrl.exams,
   },
-  {
-    code: `${pathUrl.subjects}-list`,
-    title: 'Các môn học',
-    icon: 'dashboard',
-    path: pathUrl.subjects,
-  },
+  // {
+  //   code: `${pathUrl.subjects}-list`,
+  //   title: 'Các môn học',
+  //   icon: 'dashboard',
+  //   path: pathUrl.subjects,
+  // },
   {
     code: `${pathUrl.questions}-list`,
     title: 'Danh sách câu hỏi',

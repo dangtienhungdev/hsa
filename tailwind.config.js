@@ -12,6 +12,13 @@ export default {
           '100%': { transform: 'translateX(200px)' },
         },
       },
+      colors: [
+        {
+          gray: {
+            secondary: '#EFF2F5',
+          },
+        },
+      ],
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],

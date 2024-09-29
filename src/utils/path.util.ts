@@ -1,5 +1,6 @@
 const pathUrl = {
   questions: '/questions',
+  questionDetail: '/questions/:subjectId',
   addQuestion: '/questions/create-question',
   subjects: '/subjects',
   exams: '/exams',

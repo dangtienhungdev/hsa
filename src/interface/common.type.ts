@@ -22,3 +22,9 @@ export type DataWithPaginate<T> = {
   total: number;
   per_page: number;
 };
+
+export type TQueryParams = {
+  subject_id?: string;
+  page?: string;
+  limit?: string;
+};

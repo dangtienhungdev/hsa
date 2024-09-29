@@ -9,18 +9,26 @@ import ExamPage from '@/pages/exams';
 import ExamId from '@/pages/exams/[examId]';
 import LoginPage from '@/pages/login';
 import Questions from '@/pages/questions';
+import QuestionDetail from '@/pages/questions/[subjectId]';
 import CreateQuestion from '@/pages/questions/create-question';
 import Subjects from '@/pages/subjects';
 import pathUrl from '@/utils/path.util';
 
-import { ProtectedRoute } from './config';
+import { ProtectedRoute, RejectedRoute } from './config';
 
 const NotFound = lazy(() => import('@/pages/404'));
 
 const routeList: RouteObject[] = [
   {
     path: pathUrl.login,
-    element: <LoginPage />,
+
+    element: <RejectedRoute />,
+    children: [
+      {
+        path: pathUrl.login,
+        element: <LoginPage />,
+      },
+    ],
   },
   {
     path: '/',
@@ -35,6 +43,14 @@ const routeList: RouteObject[] = [
         element: (
           <LayoutPage>
             <Questions />
+          </LayoutPage>
+        ),
+      },
+      {
+        path: pathUrl.questionDetail,
+        element: (
+          <LayoutPage>
+            <QuestionDetail />
           </LayoutPage>
         ),
       },

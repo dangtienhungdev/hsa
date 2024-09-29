@@ -1,25 +1,13 @@
-import type { TQuestion } from '@/interface/question.type';
-
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Button, Col, Row } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { questionApi } from '@/api/questions.api';
 import { subjectApi } from '@/api/subject.api';
 import { Card, CardDescription, CardTitle } from '@/components/ui/cart';
-import { useToggleModal } from '@/hooks/useToggleModal';
 import pathUrl from '@/utils/path.util';
 
 const Questions = () => {
-  const queryClient = useQueryClient();
-  const { currentModal, onCloseModal, onOpenModal } = useToggleModal<TQuestion>();
   const navigate = useNavigate();
-
-  // get data questions
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['questions'],
-    queryFn: () => questionApi.getAllQuestions(),
-  });
 
   // get data subject
   const { data: dataSubject } = useQuery({
@@ -41,10 +29,12 @@ const Questions = () => {
           dataSubject.map(subject => {
             return (
               <Col span={6} key={subject.id}>
-                <Card className="!rounded-md cursor-pointer hover:bg-blue-50">
-                  <CardTitle>{subject.name}</CardTitle>
-                  <CardDescription>{subject.description}</CardDescription>
-                </Card>
+                <Link to={`${pathUrl.questions}/${subject.id}`}>
+                  <Card className="!rounded-md cursor-pointer hover:bg-blue-50">
+                    <CardTitle>{subject.name}</CardTitle>
+                    <CardDescription>{subject.description}</CardDescription>
+                  </Card>
+                </Link>
               </Col>
             );
           })}

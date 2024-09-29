@@ -30,3 +30,7 @@ export type TQuestionBaseBody = {
 export type TQuestionSingle = TQuestionBaseBody & {
   options: Option[];
 };
+
+export type TQuestionInput = TQuestionBaseBody & {
+  correct_answer: string;
+};

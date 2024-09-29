@@ -1,15 +1,13 @@
-import type { LoginParams } from '@/interface/user/login';
-
 import './index.less';
 
-import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input, message } from 'antd';
-import { useForm } from 'antd/es/form/Form';
-import { useNavigate } from 'react-router-dom';
 
-import { userApi } from '@/api/user.api';
+import type { LoginParams } from '@/interface/user/login';
 import { useAuthContext } from '@/contexts/auth.context';
-import pathUrl from '@/utils/path.util';
+import { useForm } from 'antd/es/form/Form';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { userApi } from '@/api/user.api';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -19,10 +17,11 @@ const LoginForm = () => {
   const loginMutation = useMutation({
     mutationKey: ['login'],
     mutationFn: (body: FormData) => userApi.login(body),
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      console.log('🚀 ~ LoginForm ~ data:', data);
       setIsAuthenticated(true);
       message.success('Đăng nhập thành công!');
-      navigate(pathUrl.questions);
+      console.log('first');
     },
     onError: () => {
       setIsAuthenticated(false);
