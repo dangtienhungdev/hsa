@@ -81,7 +81,7 @@ const ListQuestionOfExam = () => {
 
   // handle add question
   const handleAddQuestion = (question: TQuestion) => {
-    const questionData = {
+    const questionData: any = {
       ...question,
       exam_id: Number(examId),
       subject_id: Number(subject),

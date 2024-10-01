@@ -1,12 +1,12 @@
+import { Button, Col, Form, InputNumber, Modal, Row, Select, Switch, message } from 'antd';
 import type { QuestionType, TQuestionInput, TQuestionSingle } from '@/interface/question.type';
-
-import { useMutation } from '@tanstack/react-query';
-import { Button, Col, Form, message, Modal, Row, Select, Switch } from 'antd';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { questionApi } from '@/api/questions.api';
 import Editor from '@/components/ckeditor';
+import { questionApi } from '@/api/questions.api';
+import { subjectApi } from '@/api/subject.api';
+import { useParams } from 'react-router-dom';
 import { useQueryParams } from '@/hooks/useQueryParams';
 
 interface FormCreateQuestionProps {
@@ -16,9 +16,10 @@ interface FormCreateQuestionProps {
 
 const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) => {
   const { examId } = useParams();
+
   const [form] = Form.useForm();
   const params = useQueryParams();
-  const { subject } = params;
+  const { subject, name, subjectId } = params;
 
   // create question signle
   const createQuestion = useMutation({
@@ -51,11 +52,17 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
     setQuestionType(type);
   };
 
+  // get data subject
+  const { data: dataSubject } = useQuery({
+    queryKey: ['subjects'],
+    queryFn: () => subjectApi.getAllSubject(),
+  });
+
   const onSubmit = (values: any) => {
     if (questionType === 'input') {
       const data = {
         ...values,
-        subject_id: Number(subject),
+        subject_id: Number(subjectId),
         is_group: false,
         exam_id: Number(examId),
         correct_answer: values.correct_answer_input,
@@ -76,7 +83,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
       // Thay thế options trong values với updatedOptions
       const updatedValues = {
         ...values,
-        subject_id: Number(subject),
+        subject_id: Number(subjectId),
         is_group: false,
         exam_id: Number(examId),
         options: updatedOptions,
@@ -104,7 +111,74 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
     }
 
     if (questionType === 'group') {
+      const group_questions = [];
+
       console.log(values);
+
+      for (const question of values.group_questions) {
+        if (question.type_group === 'single') {
+          const options = (question as TQuestionSingle).options || [];
+
+          // Xử lý options để đảm bảo mỗi option có is_correct
+          const updatedOptions = options.map(option => ({
+            text: option.text,
+            is_correct: option.is_correct ?? false, // Nếu is_correct là true, giữ nguyên, nếu không có hoặc false thì set false
+          }));
+
+          // Thay thế options trong values với updatedOptions
+          const updatedValues = {
+            label: question.label,
+            ordering: question.ordering,
+            subject_id: Number(subjectId),
+            exam_id: Number(examId),
+            options: updatedOptions,
+            type: 'single',
+            name: question.name_group,
+          };
+
+          const hasCorrectAnswer = updatedOptions.some(option => option.is_correct === true);
+
+          if (!hasCorrectAnswer) {
+            // Báo lỗi nếu không có đáp án đúng
+            message.error('Bạn chưa chọn đáp án đúng!');
+
+            return;
+          }
+
+          // kiểm tra xem option có mấy đáp án đúng
+          const checkMutipleOptions = updatedOptions.filter(option => option.is_correct);
+
+          if (checkMutipleOptions.length > 1) {
+            message.error('Bạn chỉ được chọn 1 đáp án đúng!');
+
+            return;
+          }
+
+          group_questions.push(updatedValues);
+        } else {
+          const data = {
+            subject_id: Number(subjectId),
+            name: question.name_group,
+            type: 'input',
+            correct_answer: question.input_answer,
+            label: question.label,
+            ordering: question.ordering,
+          };
+
+          group_questions.push(data);
+        }
+      }
+
+      const dataSendAPi: any = {
+        subject_id: Number(subjectId),
+        exam_id: Number(examId),
+        content_question_group: values.name,
+        correct_answer: 'answer input, ....',
+        is_group: true,
+        group_questions: group_questions,
+      };
+
+      createQuestion.mutate(dataSendAPi);
     }
   };
 
@@ -116,7 +190,10 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
 
   return (
     <Modal
-      title={`Thêm mới câu hỏi ${subject === '2' ? 'Tư duy định lượng (Toán học)' : 'Tư duy định tính (Văn học)'}`}
+      title={
+        `Thêm mới câu hỏi ${name}` ??
+        `Thêm mới câu hỏi ${subject === '2' ? 'Tư duy định lượng (Toán học)' : 'Tư duy định tính (Văn học)'}`
+      }
       open={isOpenModal}
       onOk={() => form.submit()}
       onCancel={() => onClose()}
@@ -155,7 +232,29 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                 </Form.Item>
               </Col>
 
-              <Col span={12}>
+              <Col span={8}>
+                <Form.Item
+                  name={'label'}
+                  label={'Câu hỏi số'}
+                  rules={[{ required: true, message: 'Câu hỏi là bắt buộc!' }]}
+                  className="!mb-0"
+                >
+                  <InputNumber size="large" className="!w-full" min={0} max={51} />
+                </Form.Item>
+              </Col>
+
+              <Col span={8}>
+                <Form.Item
+                  name={'ordering'}
+                  label={'Thứ tự câu hỏi'}
+                  rules={[{ required: true, message: 'Thứ tự câu hỏi bắt buộc!' }]}
+                  className="!mb-0"
+                >
+                  <InputNumber size="large" className="!w-full" min={0} max={51} />
+                </Form.Item>
+              </Col>
+
+              <Col span={8}>
                 <Form.Item
                   name={'type'}
                   label={'Dạng câu hỏi'}
@@ -307,7 +406,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                                 </Form.Item>
                               </Col>
 
-                              <Col span={12}>
+                              <Col span={8}>
                                 <Form.Item
                                   {...restField}
                                   name={[name, 'type_group']}
@@ -339,36 +438,72 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                                   />
                                 </Form.Item>
                               </Col>
+
+                              <Col span={8}>
+                                <Form.Item
+                                  name={[name, 'label']}
+                                  label={'Câu hỏi số'}
+                                  rules={[{ required: true, message: 'Câu hỏi là bắt buộc!' }]}
+                                  className="!mb-0"
+                                >
+                                  <InputNumber size="large" className="!w-full" min={0} max={51} />
+                                </Form.Item>
+                              </Col>
+
+                              <Col span={8}>
+                                <Form.Item
+                                  name={[name, 'ordering']}
+                                  label={'Thứ tự câu hỏi'}
+                                  rules={[{ required: true, message: 'Thứ tự câu hỏi bắt buộc!' }]}
+                                  className="!mb-0"
+                                >
+                                  <InputNumber size="large" className="!w-full" min={0} max={51} />
+                                </Form.Item>
+                              </Col>
                             </Row>
                           </Col>
 
                           {/* Hiển thị dạng câu hỏi dựa trên type_group */}
                           <Col span={24}>
                             {form.getFieldValue(['group_questions', index, 'type_group']) === 'single' && (
-                              <Form.List name={[name, 'options']}>
+                              <Form.List
+                                name={[name, 'options']}
+                                initialValue={[{ index: 0 }, { index: 1 }, { index: 2 }, { index: 3 }]}
+                              >
                                 {optionFields => {
-                                  console.log('🚀 ~ FormCreateQuestion ~ optionFields:', optionFields);
-
                                   return (
                                     <>
-                                      {[{}, {}, {}, {}].map(({ key, name, ...restField }, index) => (
-                                        <Row gutter={24} key={index}>
+                                      {[0, 1, 2, 3].map(optionIndex => (
+                                        <Row gutter={24} key={optionIndex}>
                                           <Col span={20}>
                                             <Form.Item
-                                              {...restField}
-                                              name={[name, 'text']}
-                                              label={'Đáp án'}
+                                              name={[optionIndex, 'text']}
+                                              label={`Đáp án ${optionIndex + 1}`}
                                               rules={[{ required: true, message: 'Đáp án là bắt buộc!' }]}
                                             >
                                               <Editor
-                                                value={form.getFieldValue(['group_questions', name, 'text']) || ''}
+                                                value={
+                                                  form.getFieldValue([
+                                                    'group_questions',
+                                                    name,
+                                                    'options',
+                                                    optionIndex,
+                                                    'text',
+                                                  ]) || ''
+                                                } // Thêm fallback '' nếu không có giá trị
                                                 setValue={newValue => {
+                                                  const groupQuestions = form.getFieldValue('group_questions') || []; // Thêm fallback nếu không có giá trị
+
+                                                  const updatedOptions =
+                                                    Array.isArray(groupQuestions[name].options) &&
+                                                    groupQuestions[name].options.map((opt: any, optIdx: number) => {
+                                                      return optIdx === optionIndex ? { ...opt, text: newValue } : opt;
+                                                    });
+
                                                   form.setFieldsValue({
-                                                    group_questions: form
-                                                      .getFieldValue('group_questions')
-                                                      .map((item, idx) =>
-                                                        idx === name ? { ...item, text: newValue } : item,
-                                                      ),
+                                                    group_questions: groupQuestions.map((item: any, idx: number) =>
+                                                      idx === name ? { ...item, options: updatedOptions } : item,
+                                                    ),
                                                   });
                                                 }}
                                               />
@@ -376,12 +511,36 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                                           </Col>
                                           <Col span={4}>
                                             <Form.Item
-                                              label={'Đáp án'}
-                                              {...restField}
-                                              name={[name, 'is_correct']}
+                                              label={`Đáp án đúng ${optionIndex + 1}`}
+                                              name={[optionIndex, 'is_correct']}
                                               valuePropName="checked"
                                             >
-                                              <Switch />
+                                              <Switch
+                                                checked={
+                                                  form.getFieldValue([
+                                                    'group_questions',
+                                                    name,
+                                                    'options',
+                                                    optionIndex,
+                                                    'is_correct',
+                                                  ]) || false
+                                                }
+                                                onChange={checked => {
+                                                  const groupQuestions = form.getFieldValue('group_questions');
+                                                  const updatedOptions = groupQuestions[name].options.map(
+                                                    (opt: any, optIdx: number) => ({
+                                                      ...opt,
+                                                      is_correct: optIdx === optionIndex ? checked : false, // Chỉ một đáp án đúng
+                                                    }),
+                                                  );
+
+                                                  form.setFieldsValue({
+                                                    group_questions: groupQuestions.map((item: any, idx: number) =>
+                                                      idx === name ? { ...item, options: updatedOptions } : item,
+                                                    ),
+                                                  });
+                                                }}
+                                              />
                                             </Form.Item>
                                           </Col>
                                         </Row>
@@ -406,7 +565,9 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                                   form.setFieldsValue({
                                     group_questions: form
                                       .getFieldValue('group_questions')
-                                      .map((item, idx) => (idx === name ? { ...item, input_answer: newValue } : item)),
+                                      .map((item: any, idx: number) =>
+                                        idx === name ? { ...item, input_answer: newValue } : item,
+                                      ),
                                   });
                                 }}
                               />

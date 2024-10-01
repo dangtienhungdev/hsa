@@ -2,13 +2,22 @@ import type { TableColumnsType } from 'antd';
 
 import { useQuery } from '@tanstack/react-query';
 import { Breadcrumb, Button, Col, Row, Table, Tag } from 'antd';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { examApi } from '@/api/exam.api';
 import pathUrl from '@/utils/path.util';
 
+import FormCreateQuestion from '../components/form-create-question';
+import DrawerSection from './drawer';
+
 const SectionPage = () => {
   const { examId, sectionId } = useParams();
+
+  const [open, setOpen] = useState<{ visible: boolean; data: any }>({
+    visible: false,
+    data: null,
+  });
 
   const { data, isLoading, isFetching } = useQuery<any>({
     queryKey: ['list-questions-by-exam-and-section'],
@@ -18,11 +27,30 @@ const SectionPage = () => {
 
   const questions = data?.questions;
 
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
   const columns: TableColumnsType<any> = [
     {
       title: 'Tên câu hỏi',
       dataIndex: 'question',
       key: 'question',
+      render: (value: string, record) => {
+        const nameQuestion = record.content_question_group || value;
+
+        return (
+          <p
+            dangerouslySetInnerHTML={{
+              __html: nameQuestion,
+            }}
+          ></p>
+        );
+      },
+    },
+    {
+      width: 200,
+      title: 'Nhóm câu hỏi',
+      dataIndex: 'subject',
+      key: 'subject',
       render: (value: string) => {
         return (
           <p
@@ -35,6 +63,7 @@ const SectionPage = () => {
     },
     {
       title: 'Dạng câu hỏi',
+      width: 200,
       dataIndex: 'type',
       key: 'type',
       render: (value: string) => {
@@ -49,6 +78,13 @@ const SectionPage = () => {
       },
     },
   ];
+
+  const handleOpen = (value: any) => {
+    setOpen({
+      visible: true,
+      data: value,
+    });
+  };
 
   return (
     <Row>
@@ -65,7 +101,7 @@ const SectionPage = () => {
             </Breadcrumb>
           </Col>
           <Col span={12} className="!flex !justify-end">
-            <Button type="primary" size="large" className="!rounded">
+            <Button type="primary" size="large" className="!rounded" onClick={() => setIsModalOpen(true)}>
               Thêm câu hỏi
             </Button>
           </Col>
@@ -75,23 +111,22 @@ const SectionPage = () => {
       <Col span={24}>
         <Table
           columns={columns}
+          scroll={{ y: '700px' }}
+          style={{ cursor: 'pointer' }}
           loading={isLoading || isFetching}
           dataSource={questions}
+          onRow={record => ({
+            onClick: () => handleOpen(record), // Thay đổi ở đây
+          })}
           rowKey={record => {
             return record.question_id;
           }}
-          pagination={{
-            showTotal(total, range) {
-              return (
-                <div className="flex items-center justify-between w-full mr-auto text-black-second">
-                  Showing {range[0]}-{range[1]} of {total}
-                </div>
-              );
-            },
-            size: 'default',
-          }}
+          pagination={false}
         />
       </Col>
+
+      <FormCreateQuestion isOpenModal={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <DrawerSection open={open} onClose={() => setOpen({ visible: false, data: null })} />
     </Row>
   );
 };

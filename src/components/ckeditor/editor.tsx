@@ -1,3 +1,5 @@
+import './index.less';
+
 import type { Dispatch, SetStateAction } from 'react';
 
 import { CKEditor } from '@ckeditor/ckeditor5-react';
@@ -30,13 +32,32 @@ const Editor = ({ value, setValue }: EditorProps) => {
               'bulletedList',
               'numberedList',
               'imageUpload',
-              'blockQuote',
               'undo',
               'redo',
               '|',
               'MathType',
               'ChemType',
             ],
+          },
+
+          image: {
+            toolbar: [
+              'imageStyle:block',
+              'imageStyle:side',
+
+              '|',
+              'toggleImageCaption',
+              'imageTextAlternative',
+              '|',
+              'linkImage',
+            ],
+            insert: {
+              type: 'auto',
+            },
+          },
+          fontFamily: {
+            options: ['default', 'Ubuntu, Arial, sans-serif', 'Ubuntu Mono, Courier New, Courier, monospace'],
+            supportAllValues: true,
           },
         }}
         data={value}

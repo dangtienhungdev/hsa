@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Col, Empty, Row } from 'antd';
-import { Link, useParams } from 'react-router-dom';
+import { Link, createSearchParams, useParams } from 'react-router-dom';
 
 import { sectionApi } from '@/api/section.api';
 import { Card, CardTitle } from '@/components/ui/cart';
@@ -22,15 +22,30 @@ const ContentExam = () => {
           <Empty />
         </div>
       )}
-
       {dataSections && dataSections?.length > 0 && (
         <Row gutter={[24, 24]}>
           {dataSections &&
             dataSections.length > 0 &&
             dataSections.map(subject => {
+              const subjectId = subject.subjects.length === 1 ? subject.subjects[0].id : undefined;
+
               return (
                 <Col span={6} key={subject.id}>
-                  <Link to={`${pathUrl.exams}/${examId}/${subject.id}`}>
+                  <Link
+                    to={{
+                      pathname: `${pathUrl.exams}/${examId}/${subject.id}`,
+                      search: createSearchParams(
+                        subjectId
+                          ? {
+                              subjectId: subjectId.toString(),
+                              name: subject.name.toString(),
+                            }
+                          : {
+                              name: subject.name.toString(),
+                            },
+                      ).toString(),
+                    }}
+                  >
                     <Card className="!rounded-md cursor-pointer hover:bg-blue-50">
                       <CardTitle>{subject.name}</CardTitle>
                     </Card>

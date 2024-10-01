@@ -1,5 +1,3 @@
-import type { TabsProps } from 'antd';
-
 import './less/index.less';
 
 import { Breadcrumb, Button, Col, Row } from 'antd';
@@ -20,29 +18,6 @@ const ExamId = () => {
   const { name } = params;
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-  const items: TabsProps['items'] = [
-    {
-      key: '2', // id tư duy định lương (toán)
-      label: 'Tư duy định lượng (Toán học)',
-      children: <ContentExam />,
-    },
-    {
-      key: '3', // id tư duy định tính (ngữ văn)
-      label: 'Tư duy định tính (Văn học)',
-      children: 'Content of Tab Pane 2',
-    },
-  ];
-
-  const handleChangeTab = (value: string) => {
-    navigate({
-      pathname: `${pathUrl.exams}/${examId}`,
-      search: createSearchParams({
-        ...params,
-        subject: value,
-      }).toString(),
-    });
-  };
 
   useEffect(() => {
     navigate({
@@ -82,11 +57,6 @@ const ExamId = () => {
             <ContentExam />
           </div>
         </Col>
-        {/* <Col span={12}>
-          <div className="shadow !rounded bg-white h-[calc(100vh_-_64px_-_64px_-_32px)] scrollbar-hide overflow-y-scroll">
-            <ListQuestionOfExam />
-          </div>
-        </Col> */}
       </Row>
 
       <FormCreateQuestion isOpenModal={isModalOpen} onClose={() => setIsModalOpen(false)} />
