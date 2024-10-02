@@ -1,11 +1,12 @@
-import { Button, Col, Form, InputNumber, Modal, Row, Select, Switch, message } from 'antd';
+import { Button, Col, Form, InputNumber, Modal, Row, Select, Switch, Upload, message } from 'antd';
 import type { QuestionType, TQuestionInput, TQuestionSingle } from '@/interface/question.type';
 import { useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import Editor from '@/components/ckeditor';
+import type { UploadProps } from 'antd';
+import axios from 'axios';
 import { questionApi } from '@/api/questions.api';
-import { subjectApi } from '@/api/subject.api';
 import { useParams } from 'react-router-dom';
 import { useQueryParams } from '@/hooks/useQueryParams';
 
@@ -14,12 +15,15 @@ interface FormCreateQuestionProps {
   onClose: () => void;
 }
 
+const { Dragger } = Upload;
+
 const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) => {
   const { examId } = useParams();
 
   const [form] = Form.useForm();
   const params = useQueryParams();
   const { subject, name, subjectId } = params;
+  const queryClient = useQueryClient();
 
   // create question signle
   const createQuestion = useMutation({
@@ -28,6 +32,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
     onSuccess: () => {
       message.success('Thêm mới câu hỏi thành công!');
       setOptions([]);
+      queryClient.invalidateQueries({ queryKey: ['list-questions-by-exam-and-section'] });
       setNameQuestion('');
     },
     onError: () => {
@@ -52,16 +57,18 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
     setQuestionType(type);
   };
 
-  // get data subject
-  const { data: dataSubject } = useQuery({
-    queryKey: ['subjects'],
-    queryFn: () => subjectApi.getAllSubject(),
-  });
+  // image
+  const [linkImage, setLinkImage] = useState<string>('');
+
+  useEffect(() => {
+    form.resetFields();
+  }, [form]);
 
   const onSubmit = (values: any) => {
     if (questionType === 'input') {
       const data = {
         ...values,
+        images: [linkImage],
         subject_id: Number(subjectId),
         is_group: false,
         exam_id: Number(examId),
@@ -85,6 +92,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
         ...values,
         subject_id: Number(subjectId),
         is_group: false,
+        images: [linkImage],
         exam_id: Number(examId),
         options: updatedOptions,
       };
@@ -180,6 +188,59 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
 
       createQuestion.mutate(dataSendAPi);
     }
+
+    onClose();
+  };
+
+  const props: UploadProps = {
+    name: 'file',
+    maxCount: 1,
+    listType: 'picture',
+    multiple: false, // only one file to get 512 base64
+    accept: 'image/*',
+    async customRequest({ file, onSuccess, onError }) {
+      const formData = new FormData();
+
+      formData.append('upload_preset', 'hsa-dhqghn');
+      formData.append('folder', 'hsa');
+      formData.append('file', file);
+
+      console.log(file);
+      const api = import.meta.env.VITE_API_UPLOAD_IMAGE;
+      const response = await axios.post(api, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const images = response.data.url;
+
+      if (images) {
+        setLinkImage(images);
+        onSuccess && onSuccess(images);
+      } else {
+        onError &&
+          onError({
+            name: 'error',
+            message: 'Lỗi khi upload ảnh',
+          });
+      }
+    },
+    onChange(info) {
+      const { fileList } = info;
+      const { status } = info.file;
+
+      // Kiểm tra nếu số lượng file tải lên là 5
+      if (fileList.length > 5) {
+        message.warning('Không được upload file quá 150kB');
+      }
+
+      if (status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully.`);
+      } else if (status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
   };
 
   useEffect(() => {
@@ -287,61 +348,72 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
           </Col>
 
           {questionType === 'single' && (
-            <Col span={24}>
-              <Form.List name="options" initialValue={[{}, {}, {}, {}]}>
-                {fields => {
-                  return (
-                    <>
-                      {fields.map(({ key, name, ...restField }, index) => {
-                        return (
-                          <Row gutter={24} key={key}>
-                            <Col span={20}>
-                              <Form.Item
-                                label={'Nội dung đáp án'}
-                                className="!mb-6"
-                                {...restField}
-                                name={[name, 'text']}
-                                rules={[{ required: true, message: 'Đáp án là bắt buộc!' }]}
-                              >
-                                <Editor
-                                  value={options && options.length > 0 ? options[index] : ''}
-                                  setValue={newValue => {
-                                    // Cập nhật giá trị cho từng editor
-                                    const updatedOptions: any = [...options];
+            <>
+              <Col span={24}>
+                <Form.List name="options" initialValue={[{}, {}, {}, {}]}>
+                  {fields => {
+                    return (
+                      <>
+                        {fields.map(({ key, name, ...restField }, index) => {
+                          return (
+                            <Row gutter={24} key={key}>
+                              <Col span={20}>
+                                <Form.Item
+                                  label={'Nội dung đáp án'}
+                                  className="!mb-6"
+                                  {...restField}
+                                  name={[name, 'text']}
+                                  rules={[{ required: true, message: 'Đáp án là bắt buộc!' }]}
+                                >
+                                  <Editor
+                                    value={options && options.length > 0 ? options[index] : ''}
+                                    setValue={newValue => {
+                                      // Cập nhật giá trị cho từng editor
+                                      const updatedOptions: any = [...options];
 
-                                    updatedOptions[index] = newValue;
-                                    setOptions(updatedOptions);
-                                    // Đồng bộ với form field
-                                    form.setFieldsValue({
-                                      options: form
-                                        .getFieldValue('options')
-                                        .map((option: { text: string }, i: number) =>
-                                          i === index ? { ...option, text: newValue } : option,
-                                        ),
-                                    });
-                                  }}
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col span={4}>
-                              <Form.Item
-                                label={'Đáp án'}
-                                className="!mb-6"
-                                {...restField}
-                                name={[name, 'is_correct']}
-                                valuePropName="checked"
-                              >
-                                <Switch />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                        );
-                      })}
-                    </>
-                  );
-                }}
-              </Form.List>
-            </Col>
+                                      updatedOptions[index] = newValue;
+                                      setOptions(updatedOptions);
+                                      // Đồng bộ với form field
+                                      form.setFieldsValue({
+                                        options: form
+                                          .getFieldValue('options')
+                                          .map((option: { text: string }, i: number) =>
+                                            i === index ? { ...option, text: newValue } : option,
+                                          ),
+                                      });
+                                    }}
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col span={4}>
+                                <Form.Item
+                                  label={'Đáp án'}
+                                  className="!mb-6"
+                                  {...restField}
+                                  name={[name, 'is_correct']}
+                                  valuePropName="checked"
+                                >
+                                  <Switch />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          );
+                        })}
+                      </>
+                    );
+                  }}
+                </Form.List>
+              </Col>
+              <Col span={24}>
+                <Form.Item name={'images'} label="Hình ảnh" className="!mb-0">
+                  <Dragger {...props} className="!rounded-sm gap-4">
+                    <section className="flex items-center !h-10 !rounded-sm justify-center gap-4">
+                      Thêm hình ảnh
+                    </section>
+                  </Dragger>
+                </Form.Item>
+              </Col>
+            </>
           )}
           {questionType === 'input' && (
             <Col span={24}>

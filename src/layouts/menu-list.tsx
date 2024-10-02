@@ -1,5 +1,4 @@
 import type { MenuList } from '@/interface/layout/menu.interface';
-
 import pathUrl from '@/utils/path.util';
 
 const menuList: MenuList = [

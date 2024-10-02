@@ -1,15 +1,13 @@
-import type { TableColumnsType } from 'antd';
-
-import { useQuery } from '@tanstack/react-query';
 import { Breadcrumb, Button, Col, Row, Table, Tag } from 'antd';
-import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import DrawerSection from './drawer';
+import FormCreateQuestion from '../components/form-create-question';
+import type { TableColumnsType } from 'antd';
 import { examApi } from '@/api/exam.api';
 import pathUrl from '@/utils/path.util';
-
-import FormCreateQuestion from '../components/form-create-question';
-import DrawerSection from './drawer';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 const SectionPage = () => {
   const { examId, sectionId } = useParams();
@@ -38,9 +36,28 @@ const SectionPage = () => {
         const nameQuestion = record.content_question_group || value;
 
         return (
+          <div className="flex items-start gap-1">
+            <p className="font-medium whitespace-nowrap">Câu hỏi {record?.label}:</p>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: nameQuestion,
+              }}
+            ></p>
+          </div>
+        );
+      },
+    },
+    {
+      width: 120,
+      title: 'Thứ tự hiển thị',
+      dataIndex: 'ordering',
+      align: 'center',
+      key: 'ordering',
+      render: (value: string) => {
+        return (
           <p
             dangerouslySetInnerHTML={{
-              __html: nameQuestion,
+              __html: value,
             }}
           ></p>
         );
@@ -50,6 +67,7 @@ const SectionPage = () => {
       width: 200,
       title: 'Nhóm câu hỏi',
       dataIndex: 'subject',
+      align: 'center',
       key: 'subject',
       render: (value: string) => {
         return (
@@ -111,7 +129,7 @@ const SectionPage = () => {
       <Col span={24}>
         <Table
           columns={columns}
-          scroll={{ y: '700px' }}
+          scroll={{ y: '700px', x: 1000 }}
           style={{ cursor: 'pointer' }}
           loading={isLoading || isFetching}
           dataSource={questions}

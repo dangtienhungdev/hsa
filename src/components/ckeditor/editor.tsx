@@ -31,7 +31,7 @@ const Editor = ({ value, setValue }: EditorProps) => {
               'italic',
               'bulletedList',
               'numberedList',
-              'imageUpload',
+              // 'imageUpload',
               'undo',
               'redo',
               '|',

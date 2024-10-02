@@ -1,5 +1,6 @@
-import { Drawer } from 'antd';
+import './style.less';
 
+import { Drawer } from 'antd';
 import { cn } from '@/libs/cn';
 
 interface DrawerSectionProps {
@@ -13,15 +14,56 @@ const DrawerSection = ({ open, onClose }: DrawerSectionProps) => {
 
   return (
     <Drawer title={'Câu hỏi chi tiết'} placement="right" onClose={onClose} open={open.visible} width={700}>
-      <p className="flex items-center !mb-0 gap-2">
-        <span className="mb-0 font-semibold">Câu hỏi:</span>
+      <p className="flex items-start !mb-0 gap-2 text-lg">
+        <span className="mb-0 font-semibold whitespace-nowrap">Câu hỏi:</span>
         <span
-          className="mb-0"
+          className="mb-0 italic"
           dangerouslySetInnerHTML={{
             __html: data?.content_question_group || data?.question,
           }}
         />
       </p>
+
+      {data?.type === 'single' && (
+        <div className="">
+          {data?.options &&
+            data?.options.length > 0 &&
+            data?.options.map((option: any, index: number) => {
+              // Tạo mảng các chữ cái A, B, C, D... dựa trên chỉ số
+              const alphabet = String.fromCharCode(65 + index);
+
+              return (
+                <p
+                  key={option?.option_id}
+                  className={cn('flex items-start gap-2 px-2 p-1 rounded', {
+                    'bg-yellow-200': option.is_correct === '1',
+                  })}
+                >
+                  {/* Hiển thị A, B, C, D và nội dung câu hỏi */}
+                  <span className="font-semibold">{alphabet}.</span>{' '}
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: option?.option_text,
+                    }}
+                  />
+                  {option.is_correct === '1' && <span className="">(Đáp án đúng)</span>}
+                </p>
+              );
+            })}
+        </div>
+      )}
+
+      {data?.type === 'input' && (
+        <div className="flex items-center w-full gap-2 mt-4 bg-yellow-200">
+          <p
+            className={cn('flex items-center gap-2 px-2 p-1 rounded')}
+            dangerouslySetInnerHTML={{
+              __html: data?.correct_answer,
+            }}
+          ></p>
+          <span className="">(Đáp án đúng)</span>
+        </div>
+      )}
 
       {data?.type === 'group' && (
         <div className="pl-2 mt-3">

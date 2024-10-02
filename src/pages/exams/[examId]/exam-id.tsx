@@ -1,14 +1,13 @@
 import './less/index.less';
 
-import { Breadcrumb, Button, Col, Row } from 'antd';
-import { useEffect, useState } from 'react';
+import { Breadcrumb, Col, Row } from 'antd';
 import { Link, createSearchParams, useNavigate, useParams } from 'react-router-dom';
-
-import { useQueryParams } from '@/hooks/useQueryParams';
-import pathUrl from '@/utils/path.util';
+import { useEffect, useState } from 'react';
 
 import ContentExam from './components';
 import FormCreateQuestion from './components/form-create-question';
+import pathUrl from '@/utils/path.util';
+import { useQueryParams } from '@/hooks/useQueryParams';
 
 const ExamId = () => {
   const navigate = useNavigate();
@@ -44,11 +43,11 @@ const ExamId = () => {
             </Breadcrumb.Item>
           </Breadcrumb>
         </Col>
-        <Col span={12} className="!flex !justify-end">
+        {/* <Col span={12} className="!flex !justify-end">
           <Button type="primary" size="large" className="!rounded" onClick={() => setIsModalOpen(true)}>
             Thêm câu hỏi
           </Button>
-        </Col>
+        </Col> */}
       </Row>
 
       <Row gutter={[16, 16]} className="h-full">
