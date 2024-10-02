@@ -17,11 +17,10 @@ const LoginForm = () => {
   const loginMutation = useMutation({
     mutationKey: ['login'],
     mutationFn: (body: FormData) => userApi.login(body),
-    onSuccess: (data: any) => {
-      console.log('🚀 ~ LoginForm ~ data:', data);
+    onSuccess: () => {
       setIsAuthenticated(true);
       message.success('Đăng nhập thành công!');
-      console.log('first');
+      navigate('/exams');
     },
     onError: () => {
       setIsAuthenticated(false);
