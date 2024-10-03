@@ -1,13 +1,15 @@
-import { Button, Col, Form, InputNumber, Modal, Row, Select, Switch, Upload, message } from 'antd';
 import type { QuestionType, TQuestionInput, TQuestionSingle } from '@/interface/question.type';
-import { useEffect, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
-import Editor from '@/components/ckeditor';
 import type { UploadProps } from 'antd';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Col, Form, InputNumber, Modal, Row, Select, Switch, Upload, message } from 'antd';
 import axios from 'axios';
-import { questionApi } from '@/api/questions.api';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+
+import { questionApi } from '@/api/questions.api';
+import { subjectApi } from '@/api/subject.api';
+import Editor from '@/components/ckeditor';
 import { useQueryParams } from '@/hooks/useQueryParams';
 
 interface FormCreateQuestionProps {
@@ -60,6 +62,16 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
   // image
   const [linkImage, setLinkImage] = useState<string>('');
 
+  // data subject
+  const { data: dataSubjects } = useQuery({
+    queryKey: ['subjects'],
+    queryFn: () => subjectApi.getAllSubject(),
+  });
+  const dataSubjectOptions = useMemo(
+    () => dataSubjects?.filter(item => item.id !== 2 && item.id !== 3),
+    [dataSubjects],
+  );
+
   useEffect(() => {
     form.resetFields();
   }, [form]);
@@ -69,7 +81,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
       const data = {
         ...values,
         images: [linkImage],
-        subject_id: Number(subjectId),
+        subject_id: subjectId ? Number(subjectId) : Number(values.subject_id),
         is_group: false,
         exam_id: Number(examId),
         correct_answer: values.correct_answer_input,
@@ -90,7 +102,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
       // Thay thế options trong values với updatedOptions
       const updatedValues = {
         ...values,
-        subject_id: Number(subjectId),
+        subject_id: subjectId ? Number(subjectId) : Number(values.subject_id),
         is_group: false,
         images: [linkImage],
         exam_id: Number(examId),
@@ -137,7 +149,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
           const updatedValues = {
             label: question.label,
             ordering: question.ordering,
-            subject_id: Number(subjectId),
+            subject_id: subjectId ? Number(subjectId) : Number(values.subject_id),
             exam_id: Number(examId),
             options: updatedOptions,
             type: 'single',
@@ -165,7 +177,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
           group_questions.push(updatedValues);
         } else {
           const data = {
-            subject_id: Number(subjectId),
+            subject_id: subjectId ? Number(subjectId) : Number(values.subject_id),
             name: question.name_group,
             type: 'input',
             correct_answer: question.input_answer,
@@ -178,7 +190,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
       }
 
       const dataSendAPi: any = {
-        subject_id: Number(subjectId),
+        subject_id: subjectId ? Number(subjectId) : Number(values.subject_id),
         exam_id: Number(examId),
         content_question_group: values.name,
         correct_answer: 'answer input, ....',
@@ -293,7 +305,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                 </Form.Item>
               </Col>
 
-              <Col span={8}>
+              <Col span={subjectId ? 8 : 6}>
                 <Form.Item
                   name={'label'}
                   label={'Câu hỏi số'}
@@ -304,7 +316,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                 </Form.Item>
               </Col>
 
-              <Col span={8}>
+              <Col span={subjectId ? 8 : 6}>
                 <Form.Item
                   name={'ordering'}
                   label={'Thứ tự câu hỏi'}
@@ -315,7 +327,7 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                 </Form.Item>
               </Col>
 
-              <Col span={8}>
+              <Col span={subjectId ? 8 : 6}>
                 <Form.Item
                   name={'type'}
                   label={'Dạng câu hỏi'}
@@ -344,6 +356,27 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
                   />
                 </Form.Item>
               </Col>
+
+              {!subjectId && (
+                <Col span={subjectId ? 8 : 6}>
+                  <Form.Item
+                    name={'subject_id'}
+                    label={'Chủ đề câu hỏi'}
+                    rules={[{ required: true, message: 'Dạng câu hỏi là bắt buộc!' }]}
+                    className="!mb-0"
+                  >
+                    <Select
+                      size="large"
+                      className="w-full"
+                      // onChange={value => handleSelectQuestionType(value as QuestionType)}
+                      options={dataSubjectOptions?.map(subject => ({
+                        value: subject.id.toString(),
+                        label: subject.name,
+                      }))}
+                    />
+                  </Form.Item>
+                </Col>
+              )}
             </Row>
           </Col>
 
@@ -416,24 +449,35 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
             </>
           )}
           {questionType === 'input' && (
-            <Col span={24}>
-              <Form.Item
-                label={'Nội dung đáp án'}
-                className="!mb-6"
-                name={'correct_answer_input'}
-                rules={[{ required: questionType === 'input' ? true : false, message: 'Đáp án là bắt buộc!' }]}
-              >
-                <Editor
-                  value={inputAnswer || ''}
-                  setValue={newValue => {
-                    setInputAnswer(newValue);
-                    form.setFieldsValue({
-                      correct_answer_input: newValue,
-                    });
-                  }}
-                />
-              </Form.Item>
-            </Col>
+            <>
+              <Col span={24}>
+                <Form.Item
+                  label={'Nội dung đáp án'}
+                  className="!mb-6"
+                  name={'correct_answer_input'}
+                  rules={[{ required: questionType === 'input' ? true : false, message: 'Đáp án là bắt buộc!' }]}
+                >
+                  <Editor
+                    value={inputAnswer || ''}
+                    setValue={newValue => {
+                      setInputAnswer(newValue);
+                      form.setFieldsValue({
+                        correct_answer_input: newValue,
+                      });
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.Item name={'images'} label="Hình ảnh" className="!mb-0">
+                  <Dragger {...props} className="!rounded-sm gap-4">
+                    <section className="flex items-center !h-10 !rounded-sm justify-center gap-4">
+                      Thêm hình ảnh
+                    </section>
+                  </Dragger>
+                </Form.Item>
+              </Col>
+            </>
           )}
           {questionType === 'group' && (
             <Col span={24}>

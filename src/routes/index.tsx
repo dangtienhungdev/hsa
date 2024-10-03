@@ -21,8 +21,7 @@ const NotFound = lazy(() => import('@/pages/404'));
 
 const routeList: RouteObject[] = [
   {
-    path: pathUrl.login,
-
+    path: '',
     element: <RejectedRoute />,
     children: [
       {
@@ -32,12 +31,12 @@ const routeList: RouteObject[] = [
     ],
   },
   {
-    path: '/',
+    path: '',
     element: <ProtectedRoute />,
     children: [
       {
         index: true,
-        element: <Navigate to={pathUrl.questions} />,
+        element: <Navigate to={pathUrl.exams} />,
       },
       {
         path: pathUrl.questions,
@@ -99,11 +98,7 @@ const routeList: RouteObject[] = [
   },
   {
     path: '*',
-    element: (
-      <LayoutPage>
-        <NotFound />
-      </LayoutPage>
-    ),
+    element: <NotFound />,
   },
 ];
 

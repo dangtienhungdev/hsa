@@ -1,6 +1,6 @@
-import './index.less';
-
 import type { Dispatch, SetStateAction } from 'react';
+
+import './index.less';
 
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from 'ckeditor5-build-classic-mathtype';
@@ -64,7 +64,7 @@ const Editor = ({ value, setValue }: EditorProps) => {
         onChange={(_: any, editor: any) => {
           const data = editor.getData();
 
-          setValue(data);
+          setValue(data || '');
         }}
       />
     </div>

@@ -23,4 +23,11 @@ export const questionApi = {
 
     return response;
   },
+
+  // edit question
+  editQuestion: async (body: any) => {
+    const response = await axiosInstance.put(`${url}/${body.question_id}`, body);
+
+    return response;
+  },
 };

@@ -10,4 +10,10 @@ export const userApi = {
 
     return response.data;
   },
+
+  logout: async () => {
+    const response = await axiosInstance.post(`/logout`);
+
+    return response.data;
+  },
 };
