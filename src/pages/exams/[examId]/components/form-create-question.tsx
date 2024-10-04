@@ -1,15 +1,14 @@
-import type { QuestionType, TQuestionInput, TQuestionSingle } from '@/interface/question.type';
-import type { UploadProps } from 'antd';
-
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Col, Form, InputNumber, Modal, Row, Select, Switch, Upload, message } from 'antd';
-import axios from 'axios';
+import type { QuestionType, TQuestionInput, TQuestionSingle } from '@/interface/question.type';
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import Editor from '@/components/ckeditor';
+import type { UploadProps } from 'antd';
+import axios from 'axios';
 import { questionApi } from '@/api/questions.api';
 import { subjectApi } from '@/api/subject.api';
-import Editor from '@/components/ckeditor';
+import { useParams } from 'react-router-dom';
 import { useQueryParams } from '@/hooks/useQueryParams';
 
 interface FormCreateQuestionProps {
@@ -196,7 +195,10 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
         correct_answer: 'answer input, ....',
         is_group: true,
         group_questions: group_questions,
+        images: [linkImage],
       };
+
+      console.log('🚀 ~ onSubmit ~ dataSendAPi:', dataSendAPi);
 
       createQuestion.mutate(dataSendAPi);
     }
@@ -269,7 +271,10 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
       }
       open={isOpenModal}
       onOk={() => form.submit()}
-      onCancel={() => onClose()}
+      onCancel={() => {
+        onClose();
+        setLinkImage('');
+      }}
       width={'95vw'}
       style={{
         top: '30px',
@@ -480,227 +485,242 @@ const FormCreateQuestion = ({ onClose, isOpenModal }: FormCreateQuestionProps) =
             </>
           )}
           {questionType === 'group' && (
-            <Col span={24}>
-              <Form.List name="group_questions">
-                {(fields, { add, remove }) => {
-                  return (
-                    <div className="flex flex-col gap-4">
-                      {fields.map(({ key, name, ...restField }, index) => (
-                        <Row gutter={[24, 24]} key={key} className="bg-gray-300 !rounded p-6">
-                          <Col span={24}>
-                            <Row gutter={[24, 24]}>
+            <>
+              <Col span={24}>
+                <Form.Item name={'images'} label="Hình ảnh" className="!mb-0">
+                  <Dragger {...props} className="!rounded-sm gap-4">
+                    <section className="flex items-center !h-10 !rounded-sm justify-center gap-4">
+                      Thêm hình ảnh
+                    </section>
+                  </Dragger>
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.List name="group_questions">
+                  {(fields, { add, remove }) => {
+                    return (
+                      <div className="flex flex-col gap-4">
+                        {fields.map(({ key, name, ...restField }, index) => (
+                          <Row gutter={[24, 24]} key={key} className="bg-gray-300 !rounded p-6">
+                            <Col span={24}>
+                              <Row gutter={[24, 24]}>
+                                <Col span={24}>
+                                  <Form.Item
+                                    {...restField}
+                                    name={[name, 'name_group']}
+                                    label={'Tên câu hỏi'}
+                                    rules={[{ required: true, message: 'Tên câu hỏi là bắt buộc!' }]}
+                                    className="!mb-0"
+                                  >
+                                    <Editor
+                                      value={optionGroups[index] || ''}
+                                      setValue={newValue => {
+                                        // Cập nhật giá trị cho từng editor
+                                        const updatedOptions: any = [...optionGroups];
+
+                                        updatedOptions[index] = newValue;
+                                        setOptionGroups(updatedOptions);
+
+                                        // Đồng bộ với form field
+                                        const currentGroupQuestions = form.getFieldValue('group_questions') || [];
+
+                                        currentGroupQuestions[index] = {
+                                          ...currentGroupQuestions[index],
+                                          name_group: newValue, // Cập nhật giá trị 'name_group'
+                                        };
+
+                                        form.setFieldsValue({
+                                          group_questions: currentGroupQuestions,
+                                        });
+                                      }}
+                                    />
+                                  </Form.Item>
+                                </Col>
+
+                                <Col span={8}>
+                                  <Form.Item
+                                    {...restField}
+                                    name={[name, 'type_group']}
+                                    label={'Dạng câu hỏi'}
+                                    rules={[{ required: true, message: 'Dạng câu hỏi là bắt buộc!' }]}
+                                    className="!mb-0"
+                                  >
+                                    <Select
+                                      size="large"
+                                      className="w-full"
+                                      onChange={value => {
+                                        const currentGroupQuestions = form.getFieldValue('group_questions') || [];
+
+                                        currentGroupQuestions[index].type_group = value;
+                                        form.setFieldsValue({
+                                          group_questions: currentGroupQuestions,
+                                        });
+                                      }}
+                                      options={[
+                                        {
+                                          value: 'single',
+                                          label: 'Câu hỏi trắc nghiệm',
+                                        },
+                                        {
+                                          value: 'input',
+                                          label: 'Câu hỏi điền trả lời',
+                                        },
+                                      ]}
+                                    />
+                                  </Form.Item>
+                                </Col>
+
+                                <Col span={8}>
+                                  <Form.Item
+                                    name={[name, 'label']}
+                                    label={'Câu hỏi số'}
+                                    rules={[{ required: true, message: 'Câu hỏi là bắt buộc!' }]}
+                                    className="!mb-0"
+                                  >
+                                    <InputNumber size="large" className="!w-full" min={0} max={51} />
+                                  </Form.Item>
+                                </Col>
+
+                                <Col span={8}>
+                                  <Form.Item
+                                    name={[name, 'ordering']}
+                                    label={'Thứ tự câu hỏi'}
+                                    rules={[{ required: true, message: 'Thứ tự câu hỏi bắt buộc!' }]}
+                                    className="!mb-0"
+                                  >
+                                    <InputNumber size="large" className="!w-full" min={0} max={51} />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
+                            </Col>
+
+                            {/* Hiển thị dạng câu hỏi dựa trên type_group */}
+                            <Col span={24}>
+                              {form.getFieldValue(['group_questions', index, 'type_group']) === 'single' && (
+                                <Form.List
+                                  name={[name, 'options']}
+                                  initialValue={[{ index: 0 }, { index: 1 }, { index: 2 }, { index: 3 }]}
+                                >
+                                  {optionFields => {
+                                    return (
+                                      <>
+                                        {[0, 1, 2, 3].map(optionIndex => (
+                                          <Row gutter={24} key={optionIndex}>
+                                            <Col span={20}>
+                                              <Form.Item
+                                                name={[optionIndex, 'text']}
+                                                label={`Đáp án ${optionIndex + 1}`}
+                                                rules={[{ required: true, message: 'Đáp án là bắt buộc!' }]}
+                                              >
+                                                <Editor
+                                                  value={
+                                                    form.getFieldValue([
+                                                      'group_questions',
+                                                      name,
+                                                      'options',
+                                                      optionIndex,
+                                                      'text',
+                                                    ]) || ''
+                                                  } // Thêm fallback '' nếu không có giá trị
+                                                  setValue={newValue => {
+                                                    const groupQuestions = form.getFieldValue('group_questions') || []; // Thêm fallback nếu không có giá trị
+
+                                                    const updatedOptions =
+                                                      Array.isArray(groupQuestions[name].options) &&
+                                                      groupQuestions[name].options.map((opt: any, optIdx: number) => {
+                                                        return optIdx === optionIndex
+                                                          ? { ...opt, text: newValue }
+                                                          : opt;
+                                                      });
+
+                                                    form.setFieldsValue({
+                                                      group_questions: groupQuestions.map((item: any, idx: number) =>
+                                                        idx === name ? { ...item, options: updatedOptions } : item,
+                                                      ),
+                                                    });
+                                                  }}
+                                                />
+                                              </Form.Item>
+                                            </Col>
+                                            <Col span={4}>
+                                              <Form.Item
+                                                label={`Đáp án đúng ${optionIndex + 1}`}
+                                                name={[optionIndex, 'is_correct']}
+                                                valuePropName="checked"
+                                              >
+                                                <Switch
+                                                  checked={
+                                                    form.getFieldValue([
+                                                      'group_questions',
+                                                      name,
+                                                      'options',
+                                                      optionIndex,
+                                                      'is_correct',
+                                                    ]) || false
+                                                  }
+                                                  onChange={checked => {
+                                                    const groupQuestions = form.getFieldValue('group_questions');
+                                                    const updatedOptions = groupQuestions[name].options.map(
+                                                      (opt: any, optIdx: number) => ({
+                                                        ...opt,
+                                                        is_correct: optIdx === optionIndex ? checked : false, // Chỉ một đáp án đúng
+                                                      }),
+                                                    );
+
+                                                    form.setFieldsValue({
+                                                      group_questions: groupQuestions.map((item: any, idx: number) =>
+                                                        idx === name ? { ...item, options: updatedOptions } : item,
+                                                      ),
+                                                    });
+                                                  }}
+                                                />
+                                              </Form.Item>
+                                            </Col>
+                                          </Row>
+                                        ))}
+                                      </>
+                                    );
+                                  }}
+                                </Form.List>
+                              )}
+                            </Col>
+
+                            {form.getFieldValue(['group_questions', index, 'type_group']) === 'input' && (
                               <Col span={24}>
                                 <Form.Item
                                   {...restField}
-                                  name={[name, 'name_group']}
-                                  label={'Tên câu hỏi'}
-                                  rules={[{ required: true, message: 'Tên câu hỏi là bắt buộc!' }]}
-                                  className="!mb-0"
+                                  name={[name, 'input_answer']}
+                                  label={'Câu trả lời'}
+                                  rules={[{ required: true, message: 'Câu trả lời là bắt buộc!' }]}
                                 >
                                   <Editor
-                                    value={optionGroups[index] || ''}
+                                    value={form.getFieldValue(['group_questions', name, 'input_answer']) || ''}
                                     setValue={newValue => {
-                                      // Cập nhật giá trị cho từng editor
-                                      const updatedOptions: any = [...optionGroups];
-
-                                      updatedOptions[index] = newValue;
-                                      setOptionGroups(updatedOptions);
-
-                                      // Đồng bộ với form field
-                                      const currentGroupQuestions = form.getFieldValue('group_questions') || [];
-
-                                      currentGroupQuestions[index] = {
-                                        ...currentGroupQuestions[index],
-                                        name_group: newValue, // Cập nhật giá trị 'name_group'
-                                      };
-
                                       form.setFieldsValue({
-                                        group_questions: currentGroupQuestions,
+                                        group_questions: form
+                                          .getFieldValue('group_questions')
+                                          .map((item: any, idx: number) =>
+                                            idx === name ? { ...item, input_answer: newValue } : item,
+                                          ),
                                       });
                                     }}
                                   />
                                 </Form.Item>
                               </Col>
-
-                              <Col span={8}>
-                                <Form.Item
-                                  {...restField}
-                                  name={[name, 'type_group']}
-                                  label={'Dạng câu hỏi'}
-                                  rules={[{ required: true, message: 'Dạng câu hỏi là bắt buộc!' }]}
-                                  className="!mb-0"
-                                >
-                                  <Select
-                                    size="large"
-                                    className="w-full"
-                                    onChange={value => {
-                                      const currentGroupQuestions = form.getFieldValue('group_questions') || [];
-
-                                      currentGroupQuestions[index].type_group = value;
-                                      form.setFieldsValue({
-                                        group_questions: currentGroupQuestions,
-                                      });
-                                    }}
-                                    options={[
-                                      {
-                                        value: 'single',
-                                        label: 'Câu hỏi trắc nghiệm',
-                                      },
-                                      {
-                                        value: 'input',
-                                        label: 'Câu hỏi điền trả lời',
-                                      },
-                                    ]}
-                                  />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={8}>
-                                <Form.Item
-                                  name={[name, 'label']}
-                                  label={'Câu hỏi số'}
-                                  rules={[{ required: true, message: 'Câu hỏi là bắt buộc!' }]}
-                                  className="!mb-0"
-                                >
-                                  <InputNumber size="large" className="!w-full" min={0} max={51} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={8}>
-                                <Form.Item
-                                  name={[name, 'ordering']}
-                                  label={'Thứ tự câu hỏi'}
-                                  rules={[{ required: true, message: 'Thứ tự câu hỏi bắt buộc!' }]}
-                                  className="!mb-0"
-                                >
-                                  <InputNumber size="large" className="!w-full" min={0} max={51} />
-                                </Form.Item>
-                              </Col>
-                            </Row>
-                          </Col>
-
-                          {/* Hiển thị dạng câu hỏi dựa trên type_group */}
-                          <Col span={24}>
-                            {form.getFieldValue(['group_questions', index, 'type_group']) === 'single' && (
-                              <Form.List
-                                name={[name, 'options']}
-                                initialValue={[{ index: 0 }, { index: 1 }, { index: 2 }, { index: 3 }]}
-                              >
-                                {optionFields => {
-                                  return (
-                                    <>
-                                      {[0, 1, 2, 3].map(optionIndex => (
-                                        <Row gutter={24} key={optionIndex}>
-                                          <Col span={20}>
-                                            <Form.Item
-                                              name={[optionIndex, 'text']}
-                                              label={`Đáp án ${optionIndex + 1}`}
-                                              rules={[{ required: true, message: 'Đáp án là bắt buộc!' }]}
-                                            >
-                                              <Editor
-                                                value={
-                                                  form.getFieldValue([
-                                                    'group_questions',
-                                                    name,
-                                                    'options',
-                                                    optionIndex,
-                                                    'text',
-                                                  ]) || ''
-                                                } // Thêm fallback '' nếu không có giá trị
-                                                setValue={newValue => {
-                                                  const groupQuestions = form.getFieldValue('group_questions') || []; // Thêm fallback nếu không có giá trị
-
-                                                  const updatedOptions =
-                                                    Array.isArray(groupQuestions[name].options) &&
-                                                    groupQuestions[name].options.map((opt: any, optIdx: number) => {
-                                                      return optIdx === optionIndex ? { ...opt, text: newValue } : opt;
-                                                    });
-
-                                                  form.setFieldsValue({
-                                                    group_questions: groupQuestions.map((item: any, idx: number) =>
-                                                      idx === name ? { ...item, options: updatedOptions } : item,
-                                                    ),
-                                                  });
-                                                }}
-                                              />
-                                            </Form.Item>
-                                          </Col>
-                                          <Col span={4}>
-                                            <Form.Item
-                                              label={`Đáp án đúng ${optionIndex + 1}`}
-                                              name={[optionIndex, 'is_correct']}
-                                              valuePropName="checked"
-                                            >
-                                              <Switch
-                                                checked={
-                                                  form.getFieldValue([
-                                                    'group_questions',
-                                                    name,
-                                                    'options',
-                                                    optionIndex,
-                                                    'is_correct',
-                                                  ]) || false
-                                                }
-                                                onChange={checked => {
-                                                  const groupQuestions = form.getFieldValue('group_questions');
-                                                  const updatedOptions = groupQuestions[name].options.map(
-                                                    (opt: any, optIdx: number) => ({
-                                                      ...opt,
-                                                      is_correct: optIdx === optionIndex ? checked : false, // Chỉ một đáp án đúng
-                                                    }),
-                                                  );
-
-                                                  form.setFieldsValue({
-                                                    group_questions: groupQuestions.map((item: any, idx: number) =>
-                                                      idx === name ? { ...item, options: updatedOptions } : item,
-                                                    ),
-                                                  });
-                                                }}
-                                              />
-                                            </Form.Item>
-                                          </Col>
-                                        </Row>
-                                      ))}
-                                    </>
-                                  );
-                                }}
-                              </Form.List>
                             )}
-                          </Col>
-
-                          {form.getFieldValue(['group_questions', index, 'type_group']) === 'input' && (
-                            <Form.Item
-                              {...restField}
-                              name={[name, 'input_answer']}
-                              label={'Câu trả lời'}
-                              rules={[{ required: true, message: 'Câu trả lời là bắt buộc!' }]}
-                            >
-                              <Editor
-                                value={form.getFieldValue(['group_questions', name, 'input_answer']) || ''}
-                                setValue={newValue => {
-                                  form.setFieldsValue({
-                                    group_questions: form
-                                      .getFieldValue('group_questions')
-                                      .map((item: any, idx: number) =>
-                                        idx === name ? { ...item, input_answer: newValue } : item,
-                                      ),
-                                  });
-                                }}
-                              />
-                            </Form.Item>
-                          )}
-                        </Row>
-                      ))}
-                      <Form.Item>
-                        <Button type="dashed" onClick={() => add()}>
-                          Thêm câu hỏi phụ
-                        </Button>
-                      </Form.Item>
-                    </div>
-                  );
-                }}
-              </Form.List>
-            </Col>
+                          </Row>
+                        ))}
+                        <Form.Item>
+                          <Button type="dashed" onClick={() => add()}>
+                            Thêm câu hỏi phụ
+                          </Button>
+                        </Form.Item>
+                      </div>
+                    );
+                  }}
+                </Form.List>
+              </Col>
+            </>
           )}
         </Row>
       </Form>

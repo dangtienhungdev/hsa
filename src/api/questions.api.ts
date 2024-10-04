@@ -26,8 +26,22 @@ export const questionApi = {
 
   // edit question
   editQuestion: async (body: any) => {
-    const response = await axiosInstance.put(`${url}/${body.question_id}`, body);
+    const response = await axiosInstance.put(`${url}/${body.id}`, body);
 
     return response;
+  },
+
+  // detail quesion
+  getDetailQuestion: async (id: string) => {
+    const response = await axiosInstance.get(`${url}/${id}`);
+
+    return response.data;
+  },
+
+  // delete quesion
+  deleteQuestion: async (id: number) => {
+    const response = await axiosInstance.delete(`${url}/${id}`);
+
+    return response.data;
   },
 };
